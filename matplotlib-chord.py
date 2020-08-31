@@ -405,6 +405,7 @@ def chordDiagram(X, width=0.1, pad=2., chordwidth=0.7, colors=None,
     # configure axis
     ax.set_aspect(1)
     ax.axis('off')
+    plt.tight_layout()
 
     return nodePos
 
@@ -418,7 +419,7 @@ if __name__ == "__main__":
 
     _, ax = plt.subplots(figsize=(6, 6))
 
-    nodePos = chordDiagram(flux, ax=ax, colors=["r", "g", "b", "orange"])
+    nodePos = chordDiagram(flux, ax=ax)
     
     prop = dict(fontsize=16*0.8, ha='center', va='center')
     nodes = ['non-crystal', 'FCC', 'HCP', 'BCC']
@@ -426,9 +427,8 @@ if __name__ == "__main__":
     for i in range(4):
         ax.text(nodePos[i][0], nodePos[i][1], nodes[i], rotation=nodePos[i][2], **prop)
 
-    plt.show()
-
     plt.savefig("example.png", dpi=600,
             transparent=True,
             bbox_inches='tight', pad_inches=0.02)
 
+    plt.show()
