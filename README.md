@@ -48,7 +48,8 @@ An example can be found at the end of `matplotlib-chord.py`.
 Here is what the diagrams look like (left and right are respectively with and
 without gradient and gap):
 
-<img src="example.png" width="390" alt="Chord diagram without gradient"><img src="example_gradient.png" width="390" alt="Chord diagram without gradient">
+<img src="example_sort-size.png" width="390" alt="Chord diagram without gradient, sorted by size"><img src="example_gradient_sort-size.png" width="390" alt="Chord diagram without gradient, sorted by size">
+<img src="example_sort-distance.png" width="390" alt="Chord diagram without gradient, sorted by distance"><img src="example_gradient_sort-distance.png" width="390" alt="Chord diagram without gradient, dorted by distance">
 
 
 ## Contributors
