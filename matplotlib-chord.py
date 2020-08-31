@@ -6,10 +6,12 @@ from collections.abc import Sequence
 
 import matplotlib.patches as patches
 
-from matplotlib.colors import ColorConverter, LinearSegmentedColormap
+from matplotlib.colors import ColorConverter
 from matplotlib.path import Path
 
 import numpy as np
+
+from gradient import gradient
 
 
 LW = 0.3
@@ -20,62 +22,6 @@ def dist(points):
     x2, y2 = points[1]
 
     return np.sqrt((x2 - x1)*(x2 - x1) + (y2 - y1)*(y2 - y1))
-
-
-def linear_gradient(cstart, cend, n=10):
-    '''
-    Return a gradient list of `n` colors going from `cstart` to `cend`.
-    '''
-    s = np.array(ColorConverter.to_rgb(cstart))
-    f = np.array(ColorConverter.to_rgb(cend))
-
-    rgb_list = [s + (t / (n - 1))*(f - s) for t in range(n)]
-
-    return rgb_list
-
-
-def gradient(start, end, color1, color2, meshgrid, mask, ax, alpha):
-    '''
-    Create a linear gradient from `start` to `end`, which is translationally
-    invarient in the orthogonal direction.
-    The gradient is then cliped by the mask.
-    '''
-    xs, ys = start
-    xe, ye = end
-
-    Z = None
-
-    X, Y = meshgrid
-
-    # get the orthogonal projection of each point on the gradient start line
-    if np.isclose(ye, ys):
-        Z = np.clip((X - xs) / (xe - xs), 0, 1)
-    else:
-        Yh = ys
-
-        if not np.isclose(xe, xs):
-            norm = np.sqrt((ye-ys)*(ye-ys) / ((xe-xs)*(xe-xs)) + 1)
-
-            Yh = ys + ((ys - ye)*(X - xs)/(xe - xs) + (Y - ys)) / norm
-
-        # generate the image, varying from 0 to 1
-        Z = np.clip((Y - Yh) / (ye - ys), 0, 1)
-
-    # generate the colormap
-    n_bin = 100
-
-    color_list = linear_gradient(color1, color2, n_bin)
-
-    cmap = LinearSegmentedColormap.from_list("gradient", color_list, N=n_bin)
-
-    im = ax.imshow(Z, interpolation='bilinear', cmap=cmap,
-                   origin='lower', extent=[-1, 1, -1, 1],
-                   clip_path=mask, clip_on=True, alpha=alpha)
-
-    # ~ im = ax.imshow(Z, interpolation='bilinear', cmap=cmap,
-                   # ~ origin='lower', extent=[-1, 1, -1, 1], alpha=alpha)
-
-    im.set_clip_path(mask)
 
 
 def polar2xy(r, theta):
@@ -142,9 +88,10 @@ def initial_path(start, end, radius, width):
     return start, end, verts, codes
 
 
-def IdeogramArc(start, end, radius=1., width=0.2, color="r", alpha=0.7, ax=None):
+def ideogram_arc(start, end, radius=1., width=0.2, color="r", alpha=0.7,
+                 ax=None):
     '''
-    Draw an arc between two regions of the chord diagram.
+    Draw an arc symbolizing a region of the chord diagram.
 
     Parameters
     ----------
@@ -153,9 +100,13 @@ def IdeogramArc(start, end, radius=1., width=0.2, color="r", alpha=0.7, ax=None)
     end : float (degree in 0, 360)
         Final degree.
     radius : float, optional (default: 1)
+        External radius of the arc.
     width : float, optional (default: 0.2)
-    ax : matplotlib axis, optional (default: not plot)
+        Width of the arc.
+    ax : matplotlib axis, optional (default: not plotted)
+        Axis on which the arc should be plotted.
     color : valid matplotlib color, optional (default: "r")
+        Color of the arc.
 
     Returns
     -------
@@ -166,9 +117,9 @@ def IdeogramArc(start, end, radius=1., width=0.2, color="r", alpha=0.7, ax=None)
 
     opt    = 4./3. * np.tan((end-start)/ 16.) * radius
     inner  = radius*(1-width)
-    inter1 = start*(3./4.)+end*(1./4.)
-    inter2 = start*(2./4.)+end*(2./4.)
-    inter3 = start*(1./4.)+end*(3./4.)
+    inter1 = start*(3./4.) + end*(1./4.)
+    inter2 = start*(2./4.) + end*(2./4.)
+    inter3 = start*(1./4.) + end*(3./4.)
 
     verts += [
         polar2xy(inner, end),
@@ -219,8 +170,42 @@ def IdeogramArc(start, end, radius=1., width=0.2, color="r", alpha=0.7, ax=None)
     return verts, codes
 
 
-def ChordArc(start1, end1, start2, end2, radius=1.0, chordwidth=0.7,
-             color="r", cend="r", alpha=0.7, ax=None, use_gradient=False):
+def chord_arc(start1, end1, start2, end2, radius=1.0, chordwidth=0.7,
+              ax=None, color="r", cend="r", alpha=0.7, use_gradient=False):
+    '''
+    Draw a chord between two regions (arcs) of the chord diagram.
+
+    Parameters
+    ----------
+    start1 : float (degree in 0, 360)
+        Starting degree.
+    end1 : float (degree in 0, 360)
+        Final degree.
+    start2 : float (degree in 0, 360)
+        Starting degree.
+    end2 : float (degree in 0, 360)
+        Final degree.
+    radius : float, optional (default: 1)
+        External radius of the arc.
+    chordwidth : float, optional (default: 0.2)
+        Width of the chord.
+    ax : matplotlib axis, optional (default: not plotted)
+        Axis on which the chord should be plotted.
+    color : valid matplotlib color, optional (default: "r")
+        Color of the chord or of its beginning if `use_gradient` is True.
+    cend : valid matplotlib color, optional (default: "r")
+        Color of the end of the chord if `use_gradient` is True.
+    alpha : float, optional (default: 0.7)
+        Opacity of the chord.
+    use_gradient : bool, optional (default: False)
+        Whether a gradient should be use so that chord extremities have the
+        same color as the arc they belong to.
+
+    Returns
+    -------
+    verts, codes : lists
+        Vertices and path instructions to draw the shape.
+    '''
     start1, end1, verts, codes = initial_path(start1, end1, radius, chordwidth)
 
     start2, end2, verts2, _ = initial_path(start2, end2, radius, chordwidth)
@@ -289,7 +274,8 @@ def ChordArc(start1, end1, start2, end2, radius=1.0, chordwidth=0.7,
     return verts, codes
 
 
-def selfChordArc(start=0, end=60, radius=1.0, chordwidth=0.7, color=(1,0,0), alpha=0.7, ax=None):
+def self_chord_arc(start, end, radius=1.0, chordwidth=0.7, ax=None,
+                   color=(1,0,0), alpha=0.7):
     start, end, verts, codes = initial_path(start, end, radius, chordwidth)
     
     rchord = radius * (1-chordwidth)
@@ -306,63 +292,8 @@ def selfChordArc(start=0, end=60, radius=1.0, chordwidth=0.7, color=(1,0,0), alp
         Path.CURVE4,
     ]
 
-
-def selfChordArc(start=0, end=60, radius=1.0, chordwidth=0.7, ax=None, color=(1,0,0), alpha=0.7):
-    # start, end should be in [0, 360)
-    if start > end:
-        start, end = end, start
-    start *= np.pi/180.
-    end *= np.pi/180.
-    opt = 4./3. * np.tan((end-start)/ 16.) * radius #16-vertex curves (4 quadratic Beziers which accounts for worst case scenario of 360 degrees)
-    inter1 = start*(3./4.)+end*(1./4.)
-    inter2 = start*(2./4.)+end*(2./4.)
-    inter3 = start*(1./4.)+end*(3./4.)
-    rchord = radius * (1-chordwidth)
-    verts = [
-        polar2xy(radius, start),
-        polar2xy(radius, start) + polar2xy(opt, start+0.5*np.pi),
-        polar2xy(radius, inter1) + polar2xy(opt, inter1-0.5*np.pi),
-        polar2xy(radius, inter1),
-        polar2xy(radius, inter1),
-        polar2xy(radius, inter1) + polar2xy(opt, inter1+0.5*np.pi),
-        polar2xy(radius, inter2) + polar2xy(opt, inter2-0.5*np.pi),
-        polar2xy(radius, inter2),
-        polar2xy(radius, inter2),
-        polar2xy(radius, inter2) + polar2xy(opt, inter2+0.5*np.pi),
-        polar2xy(radius, inter3) + polar2xy(opt, inter3-0.5*np.pi),
-        polar2xy(radius, inter3),
-        polar2xy(radius, inter3),
-        polar2xy(radius, inter3) + polar2xy(opt, inter3+0.5*np.pi),
-        polar2xy(radius, end) + polar2xy(opt, end-0.5*np.pi),
-        polar2xy(radius, end),
-        polar2xy(rchord, end),
-        polar2xy(rchord, start),
-        polar2xy(radius, start),
-        ]
-
-    codes = [Path.MOVETO,
-             Path.CURVE4,
-             Path.CURVE4,
-             Path.CURVE4,
-             Path.LINETO,
-             Path.CURVE4,
-             Path.CURVE4,
-             Path.CURVE4,
-             Path.LINETO,
-             Path.CURVE4,
-             Path.CURVE4,
-             Path.CURVE4,
-             Path.LINETO,
-             Path.CURVE4,
-             Path.CURVE4,
-             Path.CURVE4,
-             Path.CURVE4,
-             Path.CURVE4,
-             Path.CURVE4,
-             ]
-
     if ax is not None:
-        path = Path(verts, codes)
+        path  = Path(verts, codes)
         patch = patches.PathPatch(path, facecolor=tuple(color)+(alpha,),
                                   edgecolor=tuple(color)+(alpha,), lw=LW)
         ax.add_patch(patch)
@@ -370,41 +301,50 @@ def selfChordArc(start=0, end=60, radius=1.0, chordwidth=0.7, ax=None, color=(1,
     return verts, codes
 
 
-def chordDiagram(X, width=0.1, pad=2., chordwidth=0.7, colors=None,
-                 cmap=None, alpha=0.7, ax=None, use_gradient=False):
+def chord_diagram(mat, names=None, width=0.1, pad=2., gap=0., chordwidth=0.7,
+                  ax=None, colors=None, cmap=None, alpha=0.7,
+                  use_gradient=False, show=False, **kwargs):
     """
     Plot a chord diagram.
+
     Parameters
     ----------
-    X : square matrix
-        Flux data, X[i, j] is the flux from i to j
+    mat : square matrix
+        Flux data, mat[i, j] is the flux from i to j
+    names : list of str, optional (default: no names)
+        Names of the nodes that will be displayed.
     width : float, optional (default: 0.1)
         Width/thickness of the ideogram arc.
     pad : float, optional (default: 2)
-        Gap pad between two neighboring ideogram arcs. Unit: degree.
+        Distance between two neighboring ideogram arcs. Unit: degree.
+    gap : float, optional (default: 0)
+        Distance between the arc and the beginning of the cord.
     chordwidth : float, optional (default: 0.7)
         Position of the control points for the chords, controlling their shape.
+    ax : matplotlib axis, optional (default: new axis)
+        Matplotlib axis where the plot should be drawn.
     colors : list, optional (default: from `cmap`)
         List of user defined colors or floats.
     cmap : str or colormap object (default: viridis)
         Colormap to use.
     alpha : float in [0, 1], optional (default: 0.7)
         Opacity of the chord diagram.
-    ax : matplotlib axis, optional (default: new axis)
-        Matplotlib axis where the plot should be drawn.
     use_gradient : bool, optional (default: False)
         Whether a gradient should be use so that chord extremities have the
         same color as the arc they belong to.
+    **kwargs : keyword arguments
+        Available kwargs are "fontsize".
     """
     import matplotlib.pyplot as plt
 
     if ax is None:
         _, ax = plt.subplots()
 
-    # X[i, j]:  i -> j
-    num_nodes = len(X)
+    # mat[i, j]:  i -> j
+    num_nodes = len(mat)
 
-    x = X.sum(axis = 1) # sum over rows
+    x = mat.sum(axis = 1) # sum over rows
+
     ax.set_xlim(-1.1, 1.1)
     ax.set_ylim(-1.1, 1.1)
     
@@ -450,7 +390,7 @@ def chordDiagram(X, width=0.1, pad=2., chordwidth=0.7, colors=None,
         nodePos.append(
             tuple(polar2xy(1.1, 0.5*(start + end)*np.pi/180.)) + (angle,))
 
-        z = (X[i, :] / x[i].astype(float)) * (end - start)
+        z = (mat[i, :] / x[i].astype(float)) * (end - start)
 
         ids = np.argsort(z)
 
@@ -465,13 +405,14 @@ def chordDiagram(X, width=0.1, pad=2., chordwidth=0.7, colors=None,
     for i in range(len(x)):
         start, end = arc[i]
 
-        IdeogramArc(start=start, end=end, radius=1.0, color=colors[i],
-                    width=width, alpha=alpha, ax=ax)
+        ideogram_arc(start=start, end=end, radius=1.0, color=colors[i],
+                     width=width, alpha=alpha, ax=ax)
 
         start, end = pos[(i,i)]
 
-        selfChordArc(start, end, radius=1 - width, chordwidth=chordwidth*0.7,
-                     color=colors[i], alpha=alpha, ax=ax)
+        self_chord_arc(start, end, radius=1 - width - gap,
+                       chordwidth=0.7*chordwidth, color=colors[i],
+                       alpha=alpha, ax=ax)
 
         color = colors[i]
 
@@ -481,14 +422,30 @@ def chordDiagram(X, width=0.1, pad=2., chordwidth=0.7, colors=None,
             start1, end1 = pos[(i,j)]
             start2, end2 = pos[(j,i)]
 
-            ChordArc(start1, end1, start2, end2, radius=1 - width,
-                     chordwidth=chordwidth, color=colors[i], cend=cend,
-                     alpha=alpha, ax=ax, use_gradient=use_gradient)
+            chord_arc(start1, end1, start2, end2, radius=1 - width - gap,
+                      chordwidth=chordwidth, color=colors[i], cend=cend,
+                      alpha=alpha, ax=ax, use_gradient=use_gradient)
+
+    # add names if necessary
+    if names is not None:
+        assert len(names) == num_nodes, "One name per node is required."
+
+        prop = {
+            "fontsize": kwargs.get("fontsize", 16*0.8),
+            "ha": "center",
+            "va": "center"
+        }
+
+        for pos, name in zip(nodePos, names):
+            ax.text(pos[0], pos[1], name, rotation=pos[2], **prop)
 
     # configure axis
     ax.set_aspect(1)
     ax.axis('off')
     plt.tight_layout()
+
+    if show:
+        plt.show()
 
     return nodePos
 
@@ -502,17 +459,11 @@ if __name__ == "__main__":
       [ 1013,   990,  940, 6907]
     ])
 
+    names = ['non-crystal', 'FCC', 'HCP', 'BCC']
+
     for grd in (True, False):
-        _, ax = plt.subplots(figsize=(6, 6))
-
-        nodePos = chordDiagram(flux, ax=ax, use_gradient=grd)
         
-        prop = dict(fontsize=16*0.8, ha='center', va='center')
-        nodes = ['non-crystal', 'FCC', 'HCP', 'BCC']
-
-        for i in range(len(flux)):
-            ax.text(nodePos[i][0], nodePos[i][1], nodes[i],
-                    rotation=nodePos[i][2], **prop)
+        chord_diagram(flux, names, use_gradient=grd)
 
         plt.savefig("example{}.png".format("_gradient" if grd else ""),
                     dpi=600, transparent=True, bbox_inches='tight',
