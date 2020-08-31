@@ -46,7 +46,7 @@ def chord_diagram(mat, names=None, width=0.1, pad=2., gap=0., chordwidth=0.7,
 
 An example can be found at the end of `matplotlib-chord.py`.
 Here is what the diagrams look like (left and right are respectively with and
-without gradient):
+without gradient and gap):
 
 <img src="example.png" width="390" alt="Chord diagram without gradient"><img src="example_gradient.png" width="390" alt="Chord diagram without gradient">
 

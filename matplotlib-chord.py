@@ -461,9 +461,9 @@ if __name__ == "__main__":
 
     names = ['non-crystal', 'FCC', 'HCP', 'BCC']
 
-    for grd in (True, False):
+    for grd, gap in zip((True, False), (0.03, 0)):
         
-        chord_diagram(flux, names, use_gradient=grd)
+        chord_diagram(flux, names, gap=gap, use_gradient=grd)
 
         plt.savefig("example{}.png".format("_gradient" if grd else ""),
                     dpi=600, transparent=True, bbox_inches='tight',
