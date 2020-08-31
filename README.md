@@ -39,5 +39,5 @@ Here is what the figure looks like:
 ## Contributors
 
 * Original author: [@fengwangPhysics](https://github.com/fengwangPhysics)
-* Colormap support: [@pakitochus](https://github.com/pakitochus) (PR #1)
-* Improved arcs: [@cy1110](https://github.com/cy1110) (PR #2)
+* Colormap support: [@pakitochus](https://github.com/pakitochus) (PR [#1](https://github.com/Silmathoron/matplotlib-chord-diagram/pull/1))
+* Improved arcs: [@cy1110](https://github.com/cy1110) (PR [#2](https://github.com/Silmathoron/matplotlib-chord-diagram/pull/2))
