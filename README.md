@@ -33,7 +33,7 @@ def chordDiagram(X, ax, colors=None, cmap='rainbow', width=0.1, pad=2, chordwidt
 
 An example can be found at the end of `matplotlib-chord.py`.
 Here is what the figure looks like:
-![](example_large_new.png)
+![](example.png)
 
 
 ## Contributors
