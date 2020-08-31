@@ -38,7 +38,8 @@ def chord_diagram(mat, names=None, width=0.1, pad=2., gap=0., chordwidth=0.7,
         Whether a gradient should be use so that chord extremities have the
         same color as the arc they belong to.
     **kwargs : keyword arguments
-        Available kwargs are "fontsize".
+        Available kwargs are "fontsize" and "sort" (either "size" or
+        "distance").
     """
 ```
 
