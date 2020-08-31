@@ -38,6 +38,6 @@ Here is what the figure looks like:
 
 ## Contributors
 
-* Original author: @fengwangPhysics
-* Colormap support: @pakitochus
-* Improved arcs: @cy1110
+* Original author: [@fengwangPhysics](https://github.com/fengwangPhysics)
+* Colormap support: [@pakitochus](https://github.com/pakitochus) (PR #1)
+* Improved arcs: [@cy1110](https://github.com/cy1110) (PR #2)
