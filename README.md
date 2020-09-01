@@ -1,6 +1,6 @@
-# matplotlib-chord-diagram
+# mpl_chord_diagram
 
-Plot chord diagram with [matplotlib](https://matplotlib.org).
+Python module to plot chord diagrams with [matplotlib](https://matplotlib.org).
 
 
 ## Main plot function
@@ -46,20 +46,38 @@ def chord_diagram(mat, names=None, width=0.1, pad=2., gap=0., chordwidth=0.7,
 ## Example
 
 An example can be found at the end of `matplotlib-chord.py`.
-Here is what the diagrams look like (left and right are respectively with and
-without gradient and gap, up and down are respectively sorted by domain size
-or distance):
+Here is what the diagrams look like (with and without gradient and gap,
+up and down are sorted respectively by domain size and distance):
 
-<img src="example_sort-size.png" width="390" alt="Chord diagram without gradient, sorted by size"><img src="example_gradient_sort-size.png" width="390" alt="Chord diagram without gradient, sorted by size">
-<img src="example_sort-distance.png" width="390" alt="Chord diagram without gradient, sorted by distance"><img src="example_gradient_sort-distance.png" width="390" alt="Chord diagram without gradient, dorted by distance">
+<img src="example_sort-size.png" width="390"
+     alt="Chord diagram without gradient, sorted by size"><img
+     src="example_gradient_sort-size.png" width="390"
+     alt="Chord diagram without gradient, sorted by size">
+
+<img src="example_sort-distance.png" width="390"
+     alt="Chord diagram without gradient, sorted by distance"><img
+     src="example_gradient_sort-distance.png" width="390"
+     alt="Chord diagram without gradient, dorted by distance">
 
 
 ## Contributors
 
 * Original author: [@fengwangPhysics](https://github.com/fengwangPhysics)
-* Colormap support: [@pakitochus](https://github.com/pakitochus) (PR [#1](https://github.com/Silmathoron/matplotlib-chord-diagram/pull/1))
-* Improved arcs: [@cy1110](https://github.com/cy1110) (PR [#2](https://github.com/Silmathoron/matplotlib-chord-diagram/pull/2))
-* Tanguy Fardet:
-   - improved color support (PR [#4](https://github.com/Silmathoron/matplotlib-chord-diagram/pull/4))
-   - gradients (PR [#5](https://github.com/Silmathoron/matplotlib-chord-diagram/pull/5))
-   - refactoring (PR [#6](https://github.com/Silmathoron/matplotlib-chord-diagram/pull/6))
+* Refactoring (Tanguy Fardet, PRs
+  [#6](https://github.com/Silmathoron/matplotlib-chord-diagram/pull/6) &
+  [#9](https://github.com/Silmathoron/matplotlib-chord-diagram/pull/9))
+* Improved color support:
+   - [@pakitochus](https://github.com/pakitochus) (PR [#1](https://github.com/Silmathoron/matplotlib-chord-diagram/pull/1))
+   - Tanguy Fardet (PRs
+      [#4](https://github.com/Silmathoron/matplotlib-chord-diagram/pull/4) for
+      colors/colormaps and
+      [#5](https://github.com/Silmathoron/matplotlib-chord-diagram/pull/5) &
+      [#7](https://github.com/Silmathoron/matplotlib-chord-diagram/pull/7) for
+      gardients)
+* Improved arcs:
+   - [@cy1110](https://github.com/cy1110) (PR [#2](https://github.com/Silmathoron/matplotlib-chord-diagram/pull/2))
+   - Tanguy Fardet (PRs
+     [#6](https://github.com/Silmathoron/matplotlib-chord-diagram/pull/6) for
+     gap addition and
+     [#7](https://github.com/Silmathoron/matplotlib-chord-diagram/pull/7) for
+     adaptive curvature and sorting)
