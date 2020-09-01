@@ -3,6 +3,23 @@
 Python module to plot chord diagrams with [matplotlib](https://matplotlib.org).
 
 
+## Usage and requirements
+
+Add the module to your ``PYTHONPATH``, then, in python script or terminal:
+
+```python
+from mpl_chord_diagram import chord_diagram
+```
+
+If you don't know how to change the ``PYTHONPATH``, use the ``example.py``
+file, it provides a workaround.
+
+The code requires ``numpy``, ``scipy`` and ``matplotlib``, you can install
+them by calling
+
+    pip install -r requirements.txt 
+
+
 ## Main plot function
 
 ```python
@@ -45,7 +62,7 @@ def chord_diagram(mat, names=None, width=0.1, pad=2., gap=0., chordwidth=0.7,
 
 ## Example
 
-An example can be found at the end of `matplotlib-chord.py`.
+An example can be found in file `example.py`.
 Here is what the diagrams look like (with and without gradient and gap,
 up and down are sorted respectively by domain size and distance):
 
@@ -73,7 +90,7 @@ up and down are sorted respectively by domain size and distance):
       colors/colormaps and
       [#5](https://github.com/Silmathoron/matplotlib-chord-diagram/pull/5) &
       [#7](https://github.com/Silmathoron/matplotlib-chord-diagram/pull/7) for
-      gardients)
+      gradients)
 * Improved arcs:
    - [@cy1110](https://github.com/cy1110) (PR [#2](https://github.com/Silmathoron/matplotlib-chord-diagram/pull/2))
    - Tanguy Fardet (PRs
