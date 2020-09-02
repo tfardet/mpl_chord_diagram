@@ -17,7 +17,7 @@ file, it provides a workaround.
 The code requires ``numpy``, ``scipy`` and ``matplotlib``, you can install
 them by calling
 
-    pip install -r requirements.txt 
+    pip install -r requirements.txt
 
 
 ## Main plot function
@@ -66,14 +66,14 @@ An example can be found in file `example.py`.
 Here is what the diagrams look like (with and without gradient and gap,
 up and down are sorted respectively by domain size and distance):
 
-<img src="example_sort-size.png" width="390"
+<img src="images/example_sort-size.png" width="390"
      alt="Chord diagram without gradient, sorted by size"><img
-     src="example_gradient_sort-size.png" width="390"
+     src="images/example_gradient_sort-size.png" width="390"
      alt="Chord diagram without gradient, sorted by size">
 
 <img src="example_sort-distance.png" width="390"
      alt="Chord diagram without gradient, sorted by distance"><img
-     src="example_gradient_sort-distance.png" width="390"
+     src="images/example_gradient_sort-distance.png" width="390"
      alt="Chord diagram without gradient, dorted by distance">
 
 
@@ -81,20 +81,25 @@ up and down are sorted respectively by domain size and distance):
 
 * Original author: [@fengwangPhysics](https://github.com/fengwangPhysics)
 * Refactoring (Tanguy Fardet, PRs
-  [#6](https://github.com/Silmathoron/matplotlib-chord-diagram/pull/6) &
-  [#9](https://github.com/Silmathoron/matplotlib-chord-diagram/pull/9))
+  [#6](https://github.com/Silmathoron/mpl_chord_diagram/pull/6),
+  [#9](https://github.com/Silmathoron/mpl_chord_diagram/pull/9) &
+  [#12](https://github.com/Silmathoron/mpl_chord_diagram/pull/12))
+* Support sparse matrices: Tanguy Fardet (PR
+  [#10](https://github.com/Silmathoron/mpl_chord_diagram/pull/10))
 * Improved color support:
-   - [@pakitochus](https://github.com/pakitochus) (PR [#1](https://github.com/Silmathoron/matplotlib-chord-diagram/pull/1))
+   - [@pakitochus](https://github.com/pakitochus) (PR
+     [#1](https://github.com/Silmathoron/mpl_chord_diagram/pull/1))
    - Tanguy Fardet (PRs
-      [#4](https://github.com/Silmathoron/matplotlib-chord-diagram/pull/4) for
+      [#4](https://github.com/Silmathoron/mpl_chord_diagram/pull/4) for
       colors/colormaps and
-      [#5](https://github.com/Silmathoron/matplotlib-chord-diagram/pull/5) &
-      [#7](https://github.com/Silmathoron/matplotlib-chord-diagram/pull/7) for
+      [#5](https://github.com/Silmathoron/mpl_chord_diagram/pull/5) &
+      [#7](https://github.com/Silmathoron/mpl_chord_diagram/pull/7) for
       gradients)
 * Improved arcs:
-   - [@cy1110](https://github.com/cy1110) (PR [#2](https://github.com/Silmathoron/matplotlib-chord-diagram/pull/2))
+   - [@cy1110](https://github.com/cy1110) (PR
+     [#2](https://github.com/Silmathoron/mpl_chord_diagram/pull/2))
    - Tanguy Fardet (PRs
-     [#6](https://github.com/Silmathoron/matplotlib-chord-diagram/pull/6) for
+     [#6](https://github.com/Silmathoron/mpl_chord_diagram/pull/6) for
      gap addition and
-     [#7](https://github.com/Silmathoron/matplotlib-chord-diagram/pull/7) for
+     [#7](https://github.com/Silmathoron/mpl_chord_diagram/pull/7) for
      adaptive curvature and sorting)
