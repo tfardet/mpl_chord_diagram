@@ -2,20 +2,23 @@
 
 Python module to plot chord diagrams with [matplotlib](https://matplotlib.org).
 
+Note that the repository has this structure (everything is on root level) to
+be able to be used more easily as a git submodule.
 
 ## Usage and requirements
 
-Add the module to your ``PYTHONPATH``, then, in python script or terminal:
+Install using
+
+    pip install mpl-chord-diagram
+
+then, in python script or terminal:
 
 ```python
 from mpl_chord_diagram import chord_diagram
 ```
 
-If you don't know how to change the ``PYTHONPATH``, use the ``example.py``
-file, it provides a workaround.
-
-The code requires ``numpy``, ``scipy`` and ``matplotlib``, you can install
-them by calling
+The code requires ``numpy``, ``scipy`` and ``matplotlib``, which should be
+installed automatically. If necessary, you can also install them by calling
 
     pip install -r requirements.txt
 

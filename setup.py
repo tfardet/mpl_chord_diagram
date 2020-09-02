@@ -13,14 +13,13 @@ except OSError as e:
         raise
 
 
-# move important
+# move important files
 move = (
     '__init__.py',
     'LICENSE',
     'chord_diagram.py',
     'gradient.py',
     'utilities.py',
-    'images',
     'example.py',
 )
 
@@ -52,7 +51,7 @@ try:
         packages = find_packages('.'),
 
         # Include the non python files:
-        package_data = {'': ['LICENSE', '*.md', '*.png']},
+        package_data = {'': ['LICENSE', '*.md']},
 
         # Requirements
         install_requires = ['numpy', 'scipy', 'matplotlib'],
@@ -79,4 +78,7 @@ except:
     pass
 finally:
     for fname in move:
-        os.rename(directory + fname, fname)
+        try:
+            os.rename(directory + fname, fname)
+        except:
+            pass
