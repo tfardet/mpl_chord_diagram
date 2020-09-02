@@ -71,7 +71,7 @@ up and down are sorted respectively by domain size and distance):
      src="images/example_gradient_sort-size.png" width="390"
      alt="Chord diagram without gradient, sorted by size">
 
-<img src="example_sort-distance.png" width="390"
+<img src="images/example_sort-distance.png" width="390"
      alt="Chord diagram without gradient, sorted by distance"><img
      src="images/example_gradient_sort-distance.png" width="390"
      alt="Chord diagram without gradient, dorted by distance">
