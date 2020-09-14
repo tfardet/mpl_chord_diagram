@@ -1,5 +1,6 @@
 import os, errno
 from setuptools import setup, find_packages
+from shutil import rmtree
 
 
 # create directory
@@ -82,3 +83,8 @@ finally:
             os.rename(directory + fname, fname)
         except:
             pass
+
+    try:
+        rmtree(directory)
+    except:
+        pass
