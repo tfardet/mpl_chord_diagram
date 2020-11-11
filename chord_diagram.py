@@ -195,7 +195,7 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
 
         if mat[i, i] > 0:
             self_chord_arc(start, end, radius=1 - width - gap,
-                           chordwidth=0.7*chordwidth, color=chord_colors[i],
+                           chordwidth=0.7*chordwidth, color=colors[i],
                            alpha=alpha, ax=ax)
 
         color = colors[i]
