@@ -21,7 +21,7 @@ LW = 0.3
 
 def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
                   chordwidth=0.7, ax=None, colors=None, cmap=None, alpha=0.7,
-                  use_gradient=False, show=False, show_zeros=True, **kwargs):
+                  use_gradient=False, show=False,**kwargs):
     """
     Plot a chord diagram.
 
@@ -54,8 +54,6 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
     use_gradient : bool, optional (default: False)
         Whether a gradient should be use so that chord extremities have the
         same color as the arc they belong to.
-    show_zeros : bool, optional (default: True)
-        Whether chords of zero-width should be shown.
     **kwargs : keyword arguments
         Available kwargs are "fontsize" and "sort" (either "size" or
         "distance"), "zero_entry_size" (in degrees, default: 0.5),
@@ -195,9 +193,9 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
 
         start, end = pos[(i, i)]
 
-        if mat[i,i]>0 or show_zeros:
+        if mat[i,i]>0:
             self_chord_arc(start, end, radius=1 - width - gap,
-                           chordwidth=0.7*chordwidth, color=colors[i],
+                           chordwidth=0.7*chordwidth, color=chord_colors[i],
                            alpha=alpha, ax=ax)
 
         color = colors[i]
@@ -207,7 +205,7 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
 
             start1, end1 = pos[(i, j)]
             start2, end2 = pos[(j, i)]
-            if mat[i,j]>0 or mat[j,i]>0 or show_zeros:
+            if mat[i,j]>0 or mat[j,i]>0:
                 chord_arc(start1, end1, start2, end2, radius=1 - width - gap,
                           chordwidth=chordwidth, color=colors[i], cend=cend,
                           alpha=alpha, ax=ax, use_gradient=use_gradient)
