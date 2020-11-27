@@ -21,7 +21,7 @@ LW = 0.3
 
 def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
                   chordwidth=0.7, ax=None, colors=None, cmap=None, alpha=0.7,
-                  use_gradient=False, show=False, **kwargs):
+                  use_gradient=False, show=False, chord_colors=None, **kwargs):
     """
     Plot a chord diagram.
 
@@ -54,6 +54,16 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
     use_gradient : bool, optional (default: False)
         Whether a gradient should be use so that chord extremities have the
         same color as the arc they belong to.
+    chord_colors : str, RGB tuple, list, optional (default: None)
+        Default (None) is to use the same values as 'colors'. Optionally,
+        one can specify different color(s) here:
+         * "red", all chords have this color
+         * [1, 0, 0] : all chords have this RGB color (red)
+         * ["red","green","blue"] : each chord gets one color of this list.
+         The list has to be of the same length as the number
+         of chords to plot, which is the number of nonzero elements of mat
+         ([ii,jj] and [jj,ii] count as one nonzero element. The list
+         entries can be themselves RGB tuples
     **kwargs : keyword arguments
         Available kwargs are "fontsize" and "sort" (either "size" or
         "distance"), "zero_entry_size" (in degrees, default: 0.5),
@@ -135,6 +145,14 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
     else:
         raise ValueError("`colors` should be a list.")
 
+    if chord_colors is None:
+       chord_colors=colors
+    else:
+        try:
+            chord_colors = [ColorConverter.to_rgb(chord_colors)]*num_nodes
+        except ValueError:
+            assert len(chord_colors)==num_nodes, "If you pass a list of chord_colors, the list has to be of len %u"%num_nodes
+
     # find position for each start and end
     y = x / np.sum(x).astype(float) * (360 - pad*len(x))
 
@@ -207,7 +225,7 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
             start2, end2 = pos[(j, i)]
             if mat[i, j] > 0 or mat[j, i] > 0:
                 chord_arc(start1, end1, start2, end2, radius=1 - width - gap,
-                          chordwidth=chordwidth, color=colors[i], cend=cend,
+                          chordwidth=chordwidth, color=chord_colors[i], cend=cend,
                           alpha=alpha, ax=ax, use_gradient=use_gradient)
 
     # add names if necessary
