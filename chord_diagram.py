@@ -394,8 +394,8 @@ def ideogram_arc(start, end, radius=1., width=0.2, color="r", alpha=0.7,
 
     if ax is not None:
         path  = Path(verts, codes)
-        patch = patches.PathPatch(path, facecolor=tuple(color) + (alpha,),
-                                  edgecolor=tuple(color) + (alpha,), lw=LW)
+        patch = patches.PathPatch(path, facecolor=color, alpha=alpha,
+                                  edgecolor=color, lw=LW)
         ax.add_patch(patch)
 
     return verts, codes
@@ -519,8 +519,8 @@ def chord_arc(start1, end1, start2, end2, radius=1.0, pad=2, chordwidth=0.7,
             gradient(points[0], points[1], min_angle, color, cend, meshgrid,
                      patch, ax, alpha)
         else:
-            patch = patches.PathPatch(path, facecolor=tuple(color)+(alpha,),
-                                      edgecolor=tuple(color)+(alpha,), lw=LW)
+            patch = patches.PathPatch(path, facecolor=color, alpha=alpha,
+                                      edgecolor=color, lw=LW)
 
             idx = 16
 
@@ -549,8 +549,8 @@ def self_chord_arc(start, end, radius=1.0, chordwidth=0.7, ax=None,
 
     if ax is not None:
         path  = Path(verts, codes)
-        patch = patches.PathPatch(path, facecolor=tuple(color)+(alpha,),
-                                  edgecolor=tuple(color)+(alpha,), lw=LW)
+        patch = patches.PathPatch(path, facecolor=color, alpha=alpha,
+                                  edgecolor=color, lw=LW)
         ax.add_patch(patch)
 
     return verts, codes
