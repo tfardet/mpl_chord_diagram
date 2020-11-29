@@ -1,5 +1,7 @@
 # mpl_chord_diagram
 
+[![License](http://img.shields.io/github/license/Silmathoron/mpl_chord_diagram)](LICENSE) ![GitHub release (latest by date)](https://img.shields.io/github/v/release/Silmathoron/mpl_chord_diagram) ![PyPI](https://img.shields.io/pypi/v/mpl-chord-diagram)
+
 Python module to plot chord diagrams with [matplotlib](https://matplotlib.org).
 
 Note that the repository has this structure (everything is on root level) to
