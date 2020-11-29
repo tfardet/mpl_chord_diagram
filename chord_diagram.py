@@ -48,18 +48,21 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
     colors : list, optional (default: from `cmap`)
         List of user defined colors or floats.
     cmap : str or colormap object (default: viridis)
-        Colormap to use.
+        Colormap that will be used to color the arcs and chords by default.
+        See `chord_colors` to use different colors for chords.
     alpha : float in [0, 1], optional (default: 0.7)
         Opacity of the chord diagram.
     use_gradient : bool, optional (default: False)
         Whether a gradient should be use so that chord extremities have the
         same color as the arc they belong to.
     chord_colors : str, RGB tuple, list, optional (default: None)
-        Default (None) is to use the same values as 'colors'. Optionally,
-        one can specify different color(s) here:
-         * "red", all chords have this color
-         * [1, 0, 0] : all chords have this RGB color (red)
-         * ["red","green","blue"] : each chord gets one color of this list.
+        Specify color(s) to fill the chords differently from the arcs.
+        When the keyword is not used, chord colors default to the colomap given
+        by `colors`.
+        Possible values for `chord_colors` are:
+         * a single color or RGB tuple, e.g. "red" or ``(1, 0, 0)``; all chords
+           will have this color
+         * a list of colors, e.g. ``["red","green","blue"]`` : each chord gets one color of this list.
          The list has to be of the same length as the number
          of chords to plot, which is the number of nonzero elements of mat
          ([ii,jj] and [jj,ii] count as one nonzero element. The list
@@ -86,7 +89,7 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
     # mat[i, j]:  i -> j
     num_nodes = mat.shape[0]
 
-    # set entries for zero entries that have a nonzero reciprocal
+    # set entry size for zero entries that have a nonzero reciprocal
     min_deg  = kwargs.get("zero_entry_size", 0.5)
     min_deg *= mat.sum() / (360 - num_nodes*pad)
 
@@ -146,7 +149,7 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
         raise ValueError("`colors` should be a list.")
 
     if chord_colors is None:
-       chord_colors=colors
+       chord_colors = colors
     else:
         try:
             chord_colors = [ColorConverter.to_rgb(chord_colors)]*num_nodes
