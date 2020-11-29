@@ -164,6 +164,7 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
     nodePos = []
     start = 0
 
+    # compute all values and optionally apply sort
     for i in range(num_nodes):
         end = start + y[i]
         arc.append((start, end))
@@ -206,30 +207,37 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
 
         start = end + pad
 
+    # plot
     for i in range(len(x)):
+        color = colors[i]
+
+        # plot the arcs
         start, end = arc[i]
 
-        ideogram_arc(start=start, end=end, radius=1.0, color=colors[i],
+        ideogram_arc(start=start, end=end, radius=1.0, color=color,
                      width=width, alpha=alpha, ax=ax)
 
         start, end = pos[(i, i)]
 
+        chord_color = chord_colors[i]
+
+        # plot self-chords
         if mat[i, i] > 0:
             self_chord_arc(start, end, radius=1 - width - gap,
-                           chordwidth=0.7*chordwidth, color=colors[i],
+                           chordwidth=0.7*chordwidth, color=chord_color,
                            alpha=alpha, ax=ax)
 
-        color = colors[i]
-
+        # plot all other chords
         for j in range(i):
             cend = chord_colors[j]
 
             start1, end1 = pos[(i, j)]
             start2, end2 = pos[(j, i)]
+
             if mat[i, j] > 0 or mat[j, i] > 0:
                 chord_arc(
                     start1, end1, start2, end2, radius=1 - width - gap,
-                    chordwidth=chordwidth, color=chord_colors[i], cend=cend,
+                    chordwidth=chordwidth, color=chord_color, cend=cend,
                     alpha=alpha, ax=ax, use_gradient=use_gradient)
 
     # add names if necessary
