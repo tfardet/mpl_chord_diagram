@@ -54,6 +54,9 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
     use_gradient : bool, optional (default: False)
         Whether a gradient should be use so that chord extremities have the
         same color as the arc they belong to.
+    show : bool, optional (default: False)
+        Whether the plot should be displayed immediately via an automatic call
+        to `plt.show()`.
     **kwargs : keyword arguments
         Available kwargs are "fontsize" and "sort" (either "size" or
         "distance"), "zero_entry_size" (in degrees, default: 0.5),
