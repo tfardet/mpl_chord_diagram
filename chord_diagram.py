@@ -21,7 +21,7 @@ LW = 0.3
 
 def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
                   chordwidth=0.7, ax=None, colors=None, cmap=None, alpha=0.7,
-                  use_gradient=False, show=False, **kwargs):
+                  use_gradient=False, chord_colors=None, show=False, **kwargs):
     """
     Plot a chord diagram.
 
@@ -48,12 +48,23 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
     colors : list, optional (default: from `cmap`)
         List of user defined colors or floats.
     cmap : str or colormap object (default: viridis)
-        Colormap to use.
+        Colormap that will be used to color the arcs and chords by default.
+        See `chord_colors` to use different colors for chords.
     alpha : float in [0, 1], optional (default: 0.7)
         Opacity of the chord diagram.
     use_gradient : bool, optional (default: False)
         Whether a gradient should be use so that chord extremities have the
         same color as the arc they belong to.
+    chord_colors : str, RGB tuple, list, optional (default: None)
+        Specify color(s) to fill the chords differently from the arcs.
+        When the keyword is not used, chord colors default to the colomap given
+        by `colors`.
+        Possible values for `chord_colors` are:
+         * a single color or RGB tuple, e.g. "red" or ``(1, 0, 0)``; all chords
+           will have this color
+         * a list of colors, e.g. ``["red","green","blue"]``, one per node.
+           Each chord will get its color from its associated source node, or
+           from both nodes if `use_gradient` is True.
     show : bool, optional (default: False)
         Whether the plot should be displayed immediately via an automatic call
         to `plt.show()`.
@@ -79,7 +90,7 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
     # mat[i, j]:  i -> j
     num_nodes = mat.shape[0]
 
-    # set entries for zero entries that have a nonzero reciprocal
+    # set entry size for zero entries that have a nonzero reciprocal
     min_deg  = kwargs.get("zero_entry_size", 0.5)
     min_deg *= mat.sum() / (360 - num_nodes*pad)
 
@@ -138,6 +149,16 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
     else:
         raise ValueError("`colors` should be a list.")
 
+    if chord_colors is None:
+       chord_colors = colors
+    else:
+        try:
+            chord_colors = [ColorConverter.to_rgb(chord_colors)] * num_nodes
+        except ValueError:
+            assert len(chord_colors) == num_nodes, \
+                "If `chord_colors` is a list of colors, it should include " \
+                "one color per node (here {} colors).".format(num_nodes)
+
     # find position for each start and end
     y = x / np.sum(x).astype(float) * (360 - pad*len(x))
 
@@ -146,6 +167,7 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
     nodePos = []
     start = 0
 
+    # compute all values and optionally apply sort
     for i in range(num_nodes):
         end = start + y[i]
         arc.append((start, end))
@@ -188,30 +210,38 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
 
         start = end + pad
 
+    # plot
     for i in range(len(x)):
+        color = colors[i]
+
+        # plot the arcs
         start, end = arc[i]
 
-        ideogram_arc(start=start, end=end, radius=1.0, color=colors[i],
+        ideogram_arc(start=start, end=end, radius=1.0, color=color,
                      width=width, alpha=alpha, ax=ax)
 
         start, end = pos[(i, i)]
 
+        chord_color = chord_colors[i]
+
+        # plot self-chords
         if mat[i, i] > 0:
             self_chord_arc(start, end, radius=1 - width - gap,
-                           chordwidth=0.7*chordwidth, color=colors[i],
+                           chordwidth=0.7*chordwidth, color=chord_color,
                            alpha=alpha, ax=ax)
 
-        color = colors[i]
-
+        # plot all other chords
         for j in range(i):
-            cend = colors[j]
+            cend = chord_colors[j]
 
             start1, end1 = pos[(i, j)]
             start2, end2 = pos[(j, i)]
+
             if mat[i, j] > 0 or mat[j, i] > 0:
-                chord_arc(start1, end1, start2, end2, radius=1 - width - gap,
-                          chordwidth=chordwidth, color=colors[i], cend=cend,
-                          alpha=alpha, ax=ax, use_gradient=use_gradient)
+                chord_arc(
+                    start1, end1, start2, end2, radius=1 - width - gap,
+                    chordwidth=chordwidth, color=chord_color, cend=cend,
+                    alpha=alpha, ax=ax, use_gradient=use_gradient)
 
     # add names if necessary
     if names is not None:
@@ -397,8 +427,8 @@ def ideogram_arc(start, end, radius=1., width=0.2, color="r", alpha=0.7,
 
     if ax is not None:
         path  = Path(verts, codes)
-        patch = patches.PathPatch(path, facecolor=tuple(color) + (alpha,),
-                                  edgecolor=tuple(color) + (alpha,), lw=LW)
+        patch = patches.PathPatch(path, facecolor=color, alpha=alpha,
+                                  edgecolor=color, lw=LW)
         ax.add_patch(patch)
 
     return verts, codes
@@ -522,8 +552,8 @@ def chord_arc(start1, end1, start2, end2, radius=1.0, pad=2, chordwidth=0.7,
             gradient(points[0], points[1], min_angle, color, cend, meshgrid,
                      patch, ax, alpha)
         else:
-            patch = patches.PathPatch(path, facecolor=tuple(color)+(alpha,),
-                                      edgecolor=tuple(color)+(alpha,), lw=LW)
+            patch = patches.PathPatch(path, facecolor=color, alpha=alpha,
+                                      edgecolor=color, lw=LW)
 
             idx = 16
 
@@ -552,8 +582,8 @@ def self_chord_arc(start, end, radius=1.0, chordwidth=0.7, ax=None,
 
     if ax is not None:
         path  = Path(verts, codes)
-        patch = patches.PathPatch(path, facecolor=tuple(color)+(alpha,),
-                                  edgecolor=tuple(color)+(alpha,), lw=LW)
+        patch = patches.PathPatch(path, facecolor=color, alpha=alpha,
+                                  edgecolor=color, lw=LW)
         ax.add_patch(patch)
 
     return verts, codes
