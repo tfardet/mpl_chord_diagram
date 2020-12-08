@@ -7,22 +7,24 @@ Python module to plot chord diagrams with [matplotlib](https://matplotlib.org).
 Note that the repository has this structure (everything is on root level) to
 be able to be used more easily as a git submodule.
 
-## Usage and requirements
+## Example
 
-Install using
+An example can be found in file `example.py`.
+Here is what the diagrams look like:
+* Upper left  >  no gradient, no gap, default colormap
+* Upper right >  gradient and gap, default colormap
+* Lower left  >  no gradient but gap, single color for chords, rotated names
+* Lower right >  gradient, no gap, "summer" colormap, rotated names
 
-    pip install mpl-chord-diagram
+<img src="images/example_sort-size.png" width="390"
+     alt="Chord diagram without gradient, sorted by size"><img
+     src="images/example_gradient_sort-size.png" width="390"
+     alt="Chord diagram without gradient, sorted by size">
 
-then, in python script or terminal:
-
-```python
-from mpl_chord_diagram import chord_diagram
-```
-
-The code requires ``numpy``, ``scipy`` and ``matplotlib``, which should be
-installed automatically. If necessary, you can also install them by calling
-
-    pip install -r requirements.txt
+<img src="images/example_sort-distance.png" width="390"
+     alt="Chord diagram without gradient, sorted by distance"><img
+     src="images/example_gradient_sort-distance.png" width="390"
+     alt="Chord diagram without gradient, sorted by distance">
 
 
 ## Main plot function
@@ -86,21 +88,23 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
     """
 ```
 
-## Example
 
-An example can be found in file `example.py`.
-Here is what the diagrams look like (with and without gradient and gap,
-up and down are sorted respectively by domain size and distance):
+## Usage and requirements
 
-<img src="images/example_sort-size.png" width="390"
-     alt="Chord diagram without gradient, sorted by size"><img
-     src="images/example_gradient_sort-size.png" width="390"
-     alt="Chord diagram without gradient, sorted by size">
+Install using
 
-<img src="images/example_sort-distance.png" width="390"
-     alt="Chord diagram without gradient, sorted by distance"><img
-     src="images/example_gradient_sort-distance.png" width="390"
-     alt="Chord diagram without gradient, dorted by distance">
+    pip install mpl-chord-diagram
+
+then, in python script or terminal:
+
+```python
+from mpl_chord_diagram import chord_diagram
+```
+
+The code requires ``numpy``, ``scipy`` and ``matplotlib``, which should be
+installed automatically. If necessary, you can also install them by calling
+
+    pip install -r requirements.txt
 
 
 ## Contributors
