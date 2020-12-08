@@ -48,22 +48,23 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
     colors : list, optional (default: from `cmap`)
         List of user defined colors or floats.
     cmap : str or colormap object (default: viridis)
-        Colormap to use.
+        Colormap that will be used to color the arcs and chords by default.
+        See `chord_colors` to use different colors for chords.
     alpha : float in [0, 1], optional (default: 0.7)
         Opacity of the chord diagram.
     use_gradient : bool, optional (default: False)
         Whether a gradient should be use so that chord extremities have the
         same color as the arc they belong to.
     chord_colors : str, RGB tuple, list, optional (default: None)
-        Default (None) is to use the same values as 'colors'. Optionally,
-        one can specify different color(s) here:
-         * "red", all chords have this color
-         * [1, 0, 0] : all chords have this RGB color (red)
-         * ["red","green","blue"] : each chord gets one color of this list.
-         The list has to be of the same length as the number
-         of chords to plot, which is the number of nonzero elements of mat
-         ([ii,jj] and [jj,ii] count as one nonzero element. The list
-         entries can be themselves RGB tuples
+        Specify color(s) to fill the chords differently from the arcs.
+        When the keyword is not used, chord colors default to the colomap given
+        by `colors`.
+        Possible values for `chord_colors` are:
+         * a single color or RGB tuple, e.g. "red" or ``(1, 0, 0)``; all chords
+           will have this color
+         * a list of colors, e.g. ``["red","green","blue"]``, one per node.
+           Each chord will get its color from its associated source node, or
+           from both nodes if `use_gradient` is True.
     **kwargs : keyword arguments
         Available kwargs are "fontsize" and "sort" (either "size" or
         "distance"), "zero_entry_size" (in degrees, default: 0.5),
@@ -86,7 +87,7 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
     # mat[i, j]:  i -> j
     num_nodes = mat.shape[0]
 
-    # set entries for zero entries that have a nonzero reciprocal
+    # set entry size for zero entries that have a nonzero reciprocal
     min_deg  = kwargs.get("zero_entry_size", 0.5)
     min_deg *= mat.sum() / (360 - num_nodes*pad)
 
@@ -146,12 +147,14 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
         raise ValueError("`colors` should be a list.")
 
     if chord_colors is None:
-       chord_colors=colors
+       chord_colors = colors
     else:
         try:
-            chord_colors = [ColorConverter.to_rgb(chord_colors)]*num_nodes
+            chord_colors = [ColorConverter.to_rgb(chord_colors)] * num_nodes
         except ValueError:
-            assert len(chord_colors)==num_nodes, "If you pass a list of chord_colors, the list has to be of len %u"%num_nodes
+            assert len(chord_colors) == num_nodes, \
+                "If `chord_colors` is a list of colors, it should include " \
+                "one color per node (here {} colors).".format(num_nodes)
 
     # find position for each start and end
     y = x / np.sum(x).astype(float) * (360 - pad*len(x))
@@ -161,6 +164,7 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
     nodePos = []
     start = 0
 
+    # compute all values and optionally apply sort
     for i in range(num_nodes):
         end = start + y[i]
         arc.append((start, end))
@@ -203,30 +207,38 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
 
         start = end + pad
 
+    # plot
     for i in range(len(x)):
+        color = colors[i]
+
+        # plot the arcs
         start, end = arc[i]
 
-        ideogram_arc(start=start, end=end, radius=1.0, color=colors[i],
+        ideogram_arc(start=start, end=end, radius=1.0, color=color,
                      width=width, alpha=alpha, ax=ax)
 
         start, end = pos[(i, i)]
 
+        chord_color = chord_colors[i]
+
+        # plot self-chords
         if mat[i, i] > 0:
             self_chord_arc(start, end, radius=1 - width - gap,
-                           chordwidth=0.7*chordwidth, color=colors[i],
+                           chordwidth=0.7*chordwidth, color=chord_color,
                            alpha=alpha, ax=ax)
 
-        color = colors[i]
-
+        # plot all other chords
         for j in range(i):
-            cend = colors[j]
+            cend = chord_colors[j]
 
             start1, end1 = pos[(i, j)]
             start2, end2 = pos[(j, i)]
+
             if mat[i, j] > 0 or mat[j, i] > 0:
-                chord_arc(start1, end1, start2, end2, radius=1 - width - gap,
-                          chordwidth=chordwidth, color=chord_colors[i], cend=cend,
-                          alpha=alpha, ax=ax, use_gradient=use_gradient)
+                chord_arc(
+                    start1, end1, start2, end2, radius=1 - width - gap,
+                    chordwidth=chordwidth, color=chord_color, cend=cend,
+                    alpha=alpha, ax=ax, use_gradient=use_gradient)
 
     # add names if necessary
     if names is not None:
