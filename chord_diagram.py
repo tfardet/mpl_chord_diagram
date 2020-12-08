@@ -21,7 +21,7 @@ LW = 0.3
 
 def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
                   chordwidth=0.7, ax=None, colors=None, cmap=None, alpha=0.7,
-                  use_gradient=False, show=False, chord_colors=None, **kwargs):
+                  use_gradient=False, chord_colors=None, show=False, **kwargs):
     """
     Plot a chord diagram.
 
@@ -55,9 +55,6 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
     use_gradient : bool, optional (default: False)
         Whether a gradient should be use so that chord extremities have the
         same color as the arc they belong to.
-    show : bool, optional (default: False)
-        Whether the plot should be displayed immediately via an automatic call
-        to `plt.show()`.
     chord_colors : str, RGB tuple, list, optional (default: None)
         Specify color(s) to fill the chords differently from the arcs.
         When the keyword is not used, chord colors default to the colomap given
@@ -68,6 +65,9 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
          * a list of colors, e.g. ``["red","green","blue"]``, one per node.
            Each chord will get its color from its associated source node, or
            from both nodes if `use_gradient` is True.
+    show : bool, optional (default: False)
+        Whether the plot should be displayed immediately via an automatic call
+        to `plt.show()`.
     **kwargs : keyword arguments
         Available kwargs are "fontsize" and "sort" (either "size" or
         "distance"), "zero_entry_size" (in degrees, default: 0.5),
