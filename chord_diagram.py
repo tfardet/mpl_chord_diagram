@@ -55,6 +55,9 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
     use_gradient : bool, optional (default: False)
         Whether a gradient should be use so that chord extremities have the
         same color as the arc they belong to.
+    show : bool, optional (default: False)
+        Whether the plot should be displayed immediately via an automatic call
+        to `plt.show()`.
     chord_colors : str, RGB tuple, list, optional (default: None)
         Specify color(s) to fill the chords differently from the arcs.
         When the keyword is not used, chord colors default to the colomap given

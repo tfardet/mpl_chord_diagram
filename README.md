@@ -1,5 +1,7 @@
 # mpl_chord_diagram
 
+[![License](http://img.shields.io/github/license/Silmathoron/mpl_chord_diagram)](LICENSE) ![GitHub release (latest by date)](https://img.shields.io/github/v/release/Silmathoron/mpl_chord_diagram) ![PyPI](https://img.shields.io/pypi/v/mpl-chord-diagram)
+
 Python module to plot chord diagrams with [matplotlib](https://matplotlib.org).
 
 Note that the repository has this structure (everything is on root level) to
@@ -57,9 +59,14 @@ def chord_diagram(mat, names=None, width=0.1, pad=2., gap=0., chordwidth=0.7,
     use_gradient : bool, optional (default: False)
         Whether a gradient should be use so that chord extremities have the
         same color as the arc they belong to.
+    show : bool, optional (default: False)
+        Whether the plot should be displayed immediately via an automatic call
+        to `plt.show()`.
     **kwargs : keyword arguments
         Available kwargs are "fontsize" and "sort" (either "size" or
-        "distance").
+        "distance"), "zero_entry_size" (in degrees, default: 0.5),
+        "rotate_names" (a bool or list of bools) to rotate (some of) the
+        names by 90°.
     """
 ```
 
@@ -98,7 +105,7 @@ up and down are sorted respectively by domain size and distance):
       [#5](https://github.com/Silmathoron/mpl_chord_diagram/pull/5) &
       [#7](https://github.com/Silmathoron/mpl_chord_diagram/pull/7) for
       gradients)
-* Improved arcs:
+* Improved arcs and chords:
    - [@cy1110](https://github.com/cy1110) (PR
      [#2](https://github.com/Silmathoron/mpl_chord_diagram/pull/2))
    - Tanguy Fardet (PRs
@@ -106,3 +113,6 @@ up and down are sorted respectively by domain size and distance):
      gap addition and
      [#7](https://github.com/Silmathoron/mpl_chord_diagram/pull/7) for
      adaptive curvature and sorting)
+* Do not plot chords that have zero in and out weights
+  [gph82](https://github.com/gph82)
+  (PR [#14/17](https://github.com/Silmathoron/mpl_chord_diagram/pull/14))
