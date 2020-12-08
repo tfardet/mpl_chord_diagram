@@ -28,9 +28,10 @@ installed automatically. If necessary, you can also install them by calling
 ## Main plot function
 
 ```python
-def chord_diagram(mat, names=None, width=0.1, pad=2., gap=0., chordwidth=0.7,
-                  ax=None, colors=None, cmap=None, alpha=0.7,
-                  use_gradient=False, show=False, **kwargs):
+
+def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
+                  chordwidth=0.7, ax=None, colors=None, cmap=None, alpha=0.7,
+                  use_gradient=False, chord_colors=None, show=False, **kwargs):
     """
     Plot a chord diagram.
 
@@ -39,7 +40,11 @@ def chord_diagram(mat, names=None, width=0.1, pad=2., gap=0., chordwidth=0.7,
     mat : square matrix
         Flux data, mat[i, j] is the flux from i to j
     names : list of str, optional (default: no names)
-        Names of the nodes that will be displayed.
+        Names of the nodes that will be displayed (must be ordered as the
+        matrix entries).
+    order : list, optional (default: order of the matrix entries)
+        Order in which the arcs should be placed around the trigonometric
+        circle.
     width : float, optional (default: 0.1)
         Width/thickness of the ideogram arc.
     pad : float, optional (default: 2)
@@ -53,12 +58,23 @@ def chord_diagram(mat, names=None, width=0.1, pad=2., gap=0., chordwidth=0.7,
     colors : list, optional (default: from `cmap`)
         List of user defined colors or floats.
     cmap : str or colormap object (default: viridis)
-        Colormap to use.
+        Colormap that will be used to color the arcs and chords by default.
+        See `chord_colors` to use different colors for chords.
     alpha : float in [0, 1], optional (default: 0.7)
         Opacity of the chord diagram.
     use_gradient : bool, optional (default: False)
         Whether a gradient should be use so that chord extremities have the
         same color as the arc they belong to.
+    chord_colors : str, RGB tuple, list, optional (default: None)
+        Specify color(s) to fill the chords differently from the arcs.
+        When the keyword is not used, chord colors default to the colomap given
+        by `colors`.
+        Possible values for `chord_colors` are:
+         * a single color or RGB tuple, e.g. "red" or ``(1, 0, 0)``; all chords
+           will have this color
+         * a list of colors, e.g. ``["red","green","blue"]``, one per node.
+           Each chord will get its color from its associated source node, or
+           from both nodes if `use_gradient` is True.
     show : bool, optional (default: False)
         Whether the plot should be displayed immediately via an automatic call
         to `plt.show()`.
@@ -96,15 +112,15 @@ up and down are sorted respectively by domain size and distance):
   [#12](https://github.com/Silmathoron/mpl_chord_diagram/pull/12))
 * Support sparse matrices: Tanguy Fardet (PR
   [#10](https://github.com/Silmathoron/mpl_chord_diagram/pull/10))
-* Improved color support:
+* Improved color support (colormaps, gradients, chord colors):
    - [@pakitochus](https://github.com/pakitochus) (PR
      [#1](https://github.com/Silmathoron/mpl_chord_diagram/pull/1))
    - Tanguy Fardet (PRs
-      [#4](https://github.com/Silmathoron/mpl_chord_diagram/pull/4) for
-      colors/colormaps and
+      [#4](https://github.com/Silmathoron/mpl_chord_diagram/pull/4),
       [#5](https://github.com/Silmathoron/mpl_chord_diagram/pull/5) &
-      [#7](https://github.com/Silmathoron/mpl_chord_diagram/pull/7) for
-      gradients)
+      [#7](https://github.com/Silmathoron/mpl_chord_diagram/pull/7))
+   - [gph82](https://github.com/gph82) (PR
+     [#18](https://github.com/Silmathoron/mpl_chord_diagram/pull/18))
 * Improved arcs and chords:
    - [@cy1110](https://github.com/cy1110) (PR
      [#2](https://github.com/Silmathoron/mpl_chord_diagram/pull/2))

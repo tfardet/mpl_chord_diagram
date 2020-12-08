@@ -25,11 +25,15 @@ names = ['non-crystal', 'FCC', 'HCP', 'BCC']
 # plot different examples
 
 gradients = (True, False, False, True)
-gaps = (0.03, 0, 0.03, 0)
-sorts = ("size", "size", "distance", "distance")
 
-for grd, gap, sort in zip(gradients, gaps, sorts):
-    chord_diagram(flux, names, gap=gap, use_gradient=grd, sort=sort)
+gaps  = (0.03, 0, 0.03, 0)
+sorts = ("size", "size", "distance", "distance")
+cclrs = (None, None, "slategrey", None)
+nrota = (False, False, True, True)
+
+for grd, gap, sort, cc, nr in zip(gradients, gaps, sorts, cclrs, nrota):
+    chord_diagram(flux, names, gap=gap, use_gradient=grd, sort=sort,
+                  chord_colors=cc, rotate_names=nr)
 
     str_grd = "_gradient" if grd else ""
 
