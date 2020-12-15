@@ -11,20 +11,20 @@ be able to be used more easily as a git submodule.
 
 An example can be found in file `example.py`.
 Here is what the diagrams look like:
-* Upper left  >  no gradient, no gap, default colormap
-* Upper right >  gradient and gap, default colormap
-* Lower left  >  no gradient but gap, single color for chords, rotated names
-* Lower right >  gradient, no gap, "summer" colormap, rotated names
+* Upper left  >  no gradient, no gap, default colormap, default order
+* Upper right >  gradient, no gap, "summer" colormap, rotated names, sorted by distance
+* Lower left  >  no gradient but gap, single color for chords, rotated names, sorted by distance
+* Lower right >  gradient and gap, default colormap, default order
 
 <img src="images/example_sort-size.png" width="390"
      alt="Chord diagram without gradient, sorted by size"><img
-     src="images/example_gradient_sort-size.png" width="390"
-     alt="Chord diagram without gradient, sorted by size">
+     src="images/example_gradient_sort-distance.png" width="390"
+     alt="Chord diagram without gradient, sorted by distance">
 
 <img src="images/example_sort-distance.png" width="390"
      alt="Chord diagram without gradient, sorted by distance"><img
-     src="images/example_gradient_sort-distance.png" width="390"
-     alt="Chord diagram without gradient, sorted by distance">
+     src="images/example_gradient_sort-size.png" width="390"
+     alt="Chord diagram without gradient, sorted by size">
 
 
 ## Main plot function
