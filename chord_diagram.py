@@ -165,6 +165,7 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
     pos = {}
     arc = []
     nodePos = []
+    rotation = []
     start = 0
 
     # compute all values and optionally apply sort
@@ -173,10 +174,12 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
         arc.append((start, end))
         angle = 0.5*(start+end)
 
-        if -30 <= angle <= 210:
+        if -30 <= angle <= 180:
             angle -= 90
+            rotation.append(False)
         else:
             angle -= 270
+            rotation.append(True)
 
         nodePos.append(
             tuple(polar2xy(1.05, 0.5*(start + end)*np.pi/180.)) + (angle,))
@@ -251,9 +254,10 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
             "fontsize": kwargs.get("fontsize", 16*0.8),
             "ha": "center",
             "va": "center",
+            "rotation_mode": "anchor"
         }
 
-        for i, (pos, name) in enumerate(zip(nodePos, names)):
+        for i, (pos, name, r) in enumerate(zip(nodePos, names, rotation)):
             rotate = rotate_names[i]
             pp = prop.copy()
 
@@ -261,15 +265,17 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
                 angle  = np.average(arc[i])
                 rotate = 90
 
-                if 90 < angle < 210 or 270 < angle:
+                if 90 < angle < 180 or 270 < angle:
                     rotate = -90
 
                 if 90 < angle < 270:
                     pp["ha"] = "right"
                 else:
                     pp["ha"] = "left"
-
-                pp["rotation_mode"] = "anchor"
+            elif r:
+                pp["va"] = "top"
+            else:
+                pp["va"] = "bottom"
 
             ax.text(pos[0], pos[1], name, rotation=pos[2] + rotate, **pp)
 

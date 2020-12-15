@@ -7,6 +7,88 @@ Python module to plot chord diagrams with [matplotlib](https://matplotlib.org).
 Note that the repository has this structure (everything is on root level) to
 be able to be used more easily as a git submodule.
 
+## Example
+
+An example can be found in file `example.py`.
+Here is what the diagrams look like:
+* Upper left  >  no gradient, no gap, default colormap, default order
+* Upper right >  gradient, no gap, "summer" colormap, rotated names, sorted by distance
+* Lower left  >  no gradient but gap, single color for chords, rotated names, sorted by distance
+* Lower right >  gradient and gap, default colormap, default order
+
+<img src="images/example_sort-size.png" width="390"
+     alt="Chord diagram without gradient, sorted by size"><img
+     src="images/example_gradient_sort-distance.png" width="390"
+     alt="Chord diagram without gradient, sorted by distance">
+
+<img src="images/example_sort-distance.png" width="390"
+     alt="Chord diagram without gradient, sorted by distance"><img
+     src="images/example_gradient_sort-size.png" width="390"
+     alt="Chord diagram without gradient, sorted by size">
+
+
+## Main plot function
+
+```python
+
+def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
+                  chordwidth=0.7, ax=None, colors=None, cmap=None, alpha=0.7,
+                  use_gradient=False, chord_colors=None, show=False, **kwargs):
+    """
+    Plot a chord diagram.
+
+    Parameters
+    ----------
+    mat : square matrix
+        Flux data, mat[i, j] is the flux from i to j
+    names : list of str, optional (default: no names)
+        Names of the nodes that will be displayed (must be ordered as the
+        matrix entries).
+    order : list, optional (default: order of the matrix entries)
+        Order in which the arcs should be placed around the trigonometric
+        circle.
+    width : float, optional (default: 0.1)
+        Width/thickness of the ideogram arc.
+    pad : float, optional (default: 2)
+        Distance between two neighboring ideogram arcs. Unit: degree.
+    gap : float, optional (default: 0)
+        Distance between the arc and the beginning of the cord.
+    chordwidth : float, optional (default: 0.7)
+        Position of the control points for the chords, controlling their shape.
+    ax : matplotlib axis, optional (default: new axis)
+        Matplotlib axis where the plot should be drawn.
+    colors : list, optional (default: from `cmap`)
+        List of user defined colors or floats.
+    cmap : str or colormap object (default: viridis)
+        Colormap that will be used to color the arcs and chords by default.
+        See `chord_colors` to use different colors for chords.
+    alpha : float in [0, 1], optional (default: 0.7)
+        Opacity of the chord diagram.
+    use_gradient : bool, optional (default: False)
+        Whether a gradient should be use so that chord extremities have the
+        same color as the arc they belong to.
+    chord_colors : str, RGB tuple, list, optional (default: None)
+        Specify color(s) to fill the chords differently from the arcs.
+        When the keyword is not used, chord colors default to the colomap given
+        by `colors`.
+        Possible values for `chord_colors` are:
+         * a single color or RGB tuple, e.g. "red" or ``(1, 0, 0)``; all chords
+           will have this color
+         * a list of colors, e.g. ``["red","green","blue"]``, one per node.
+           Each chord will get its color from its associated source node, or
+           from both nodes if `use_gradient` is True.
+    show : bool, optional (default: False)
+        Whether the plot should be displayed immediately via an automatic call
+        to `plt.show()`.
+    **kwargs : keyword arguments
+        Available kwargs are "fontsize" and "sort" (either "size" or
+        "distance"), "zero_entry_size" (in degrees, default: 0.5),
+        "rotate_names" (a bool or list of bools) to rotate (some of) the
+        names by 90°.
+    """
+```
+
+
 ## Usage and requirements
 
 Install using
@@ -25,68 +107,6 @@ installed automatically. If necessary, you can also install them by calling
     pip install -r requirements.txt
 
 
-## Main plot function
-
-```python
-def chord_diagram(mat, names=None, width=0.1, pad=2., gap=0., chordwidth=0.7,
-                  ax=None, colors=None, cmap=None, alpha=0.7,
-                  use_gradient=False, show=False, **kwargs):
-    """
-    Plot a chord diagram.
-
-    Parameters
-    ----------
-    mat : square matrix
-        Flux data, mat[i, j] is the flux from i to j
-    names : list of str, optional (default: no names)
-        Names of the nodes that will be displayed.
-    width : float, optional (default: 0.1)
-        Width/thickness of the ideogram arc.
-    pad : float, optional (default: 2)
-        Distance between two neighboring ideogram arcs. Unit: degree.
-    gap : float, optional (default: 0)
-        Distance between the arc and the beginning of the cord.
-    chordwidth : float, optional (default: 0.7)
-        Position of the control points for the chords, controlling their shape.
-    ax : matplotlib axis, optional (default: new axis)
-        Matplotlib axis where the plot should be drawn.
-    colors : list, optional (default: from `cmap`)
-        List of user defined colors or floats.
-    cmap : str or colormap object (default: viridis)
-        Colormap to use.
-    alpha : float in [0, 1], optional (default: 0.7)
-        Opacity of the chord diagram.
-    use_gradient : bool, optional (default: False)
-        Whether a gradient should be use so that chord extremities have the
-        same color as the arc they belong to.
-    show : bool, optional (default: False)
-        Whether the plot should be displayed immediately via an automatic call
-        to `plt.show()`.
-    **kwargs : keyword arguments
-        Available kwargs are "fontsize" and "sort" (either "size" or
-        "distance"), "zero_entry_size" (in degrees, default: 0.5),
-        "rotate_names" (a bool or list of bools) to rotate (some of) the
-        names by 90°.
-    """
-```
-
-## Example
-
-An example can be found in file `example.py`.
-Here is what the diagrams look like (with and without gradient and gap,
-up and down are sorted respectively by domain size and distance):
-
-<img src="images/example_sort-size.png" width="390"
-     alt="Chord diagram without gradient, sorted by size"><img
-     src="images/example_gradient_sort-size.png" width="390"
-     alt="Chord diagram without gradient, sorted by size">
-
-<img src="images/example_sort-distance.png" width="390"
-     alt="Chord diagram without gradient, sorted by distance"><img
-     src="images/example_gradient_sort-distance.png" width="390"
-     alt="Chord diagram without gradient, dorted by distance">
-
-
 ## Contributors
 
 * Original author: [@fengwangPhysics](https://github.com/fengwangPhysics)
@@ -96,15 +116,15 @@ up and down are sorted respectively by domain size and distance):
   [#12](https://github.com/Silmathoron/mpl_chord_diagram/pull/12))
 * Support sparse matrices: Tanguy Fardet (PR
   [#10](https://github.com/Silmathoron/mpl_chord_diagram/pull/10))
-* Improved color support:
+* Improved color support (colormaps, gradients, chord colors):
    - [@pakitochus](https://github.com/pakitochus) (PR
      [#1](https://github.com/Silmathoron/mpl_chord_diagram/pull/1))
    - Tanguy Fardet (PRs
-      [#4](https://github.com/Silmathoron/mpl_chord_diagram/pull/4) for
-      colors/colormaps and
+      [#4](https://github.com/Silmathoron/mpl_chord_diagram/pull/4),
       [#5](https://github.com/Silmathoron/mpl_chord_diagram/pull/5) &
-      [#7](https://github.com/Silmathoron/mpl_chord_diagram/pull/7) for
-      gradients)
+      [#7](https://github.com/Silmathoron/mpl_chord_diagram/pull/7))
+   - [gph82](https://github.com/gph82) (PR
+     [#18](https://github.com/Silmathoron/mpl_chord_diagram/pull/18))
 * Improved arcs and chords:
    - [@cy1110](https://github.com/cy1110) (PR
      [#2](https://github.com/Silmathoron/mpl_chord_diagram/pull/2))

@@ -24,17 +24,21 @@ names = ['non-crystal', 'FCC', 'HCP', 'BCC']
 
 # plot different examples
 
-gradients = (True, False, False, True)
-gaps = (0.03, 0, 0.03, 0)
-sorts = ("size", "size", "distance", "distance")
+grads = (True, False, False, True)                # gradient
+gaps  = (0.03, 0, 0.03, 0)                        # gap value
+sorts = ("size", "size", "distance", "distance")  # sort type
+cclrs = (None, None, "slategrey", None)           # chord colors
+nrota = (False, False, True, True)                # name rotation
+cmaps = (None, None, None, "summer")              # colormap
 
-for grd, gap, sort in zip(gradients, gaps, sorts):
-    chord_diagram(flux, names, gap=gap, use_gradient=grd, sort=sort)
+for grd, gap, srt, cc, nr, cm in zip(grads, gaps, sorts, cclrs, nrota, cmaps):
+    chord_diagram(flux, names, gap=gap, use_gradient=grd, sort=srt,
+                  cmap=cm, chord_colors=cc, rotate_names=nr)
 
     str_grd = "_gradient" if grd else ""
 
     plt.savefig(
-        "images/example{}_sort-{}.png".format(str_grd, sort),
+        "images/example{}_sort-{}.png".format(str_grd, srt),
                 dpi=600, transparent=True, bbox_inches='tight',
                 pad_inches=0.02)
 
