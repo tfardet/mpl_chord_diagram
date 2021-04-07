@@ -1,8 +1,12 @@
 # mpl_chord_diagram
 
-[![License](http://img.shields.io/github/license/Silmathoron/mpl_chord_diagram)](LICENSE) ![GitHub release (latest by date)](https://img.shields.io/github/v/release/Silmathoron/mpl_chord_diagram) ![PyPI](https://img.shields.io/pypi/v/mpl-chord-diagram)
+[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE) ![PyPI](https://img.shields.io/pypi/v/mpl-chord-diagram)
 
 Python module to plot chord diagrams with [matplotlib](https://matplotlib.org).
+
+The code is hosted on [Codeberg's Gitea](https://codeberg.org/tfardet/mpl_chord_diagram)
+and mirrored on [GitHub](https://github.com/tfardet/mpl_chord_diagram).
+Please raise any issue you encouter on the [issue tracker](https://codeberg.org/tfardet/mpl_chord_diagram/issues).
 
 Note that the repository has this structure (everything is on root level) to
 be able to be used more easily as a git submodule.
@@ -67,24 +71,33 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
     use_gradient : bool, optional (default: False)
         Whether a gradient should be use so that chord extremities have the
         same color as the arc they belong to.
-    chord_colors : str, RGB tuple, list, optional (default: None)
+    chord_colors : str, or list of colors, optional (default: None)
         Specify color(s) to fill the chords differently from the arcs.
         When the keyword is not used, chord colors default to the colomap given
         by `colors`.
         Possible values for `chord_colors` are:
-         * a single color or RGB tuple, e.g. "red" or ``(1, 0, 0)``; all chords
-           will have this color
-         * a list of colors, e.g. ``["red","green","blue"]``, one per node.
-           Each chord will get its color from its associated source node, or
-           from both nodes if `use_gradient` is True.
+
+        * a single color (do not use an RGB tuple, use hex format instead),
+          e.g. "red" or "#ff0000"; all chords will have this color
+        * a list of colors, e.g. ``["red", "green", "blue"]``, one per node
+          (in this case, RGB tuples are accepted as entries to the list).
+          Each chord will get its color from its associated source node, or
+          from both nodes if `use_gradient` is True.
     show : bool, optional (default: False)
         Whether the plot should be displayed immediately via an automatic call
         to `plt.show()`.
-    **kwargs : keyword arguments
-        Available kwargs are "fontsize" and "sort" (either "size" or
-        "distance"), "zero_entry_size" (in degrees, default: 0.5),
-        "rotate_names" (a bool or list of bools) to rotate (some of) the
-        names by 90°.
+    kwargs : keyword arguments
+        Available kwargs are:
+
+        ================  ==================  ===============================
+              Name               Type           Purpose and possible values
+        ================  ==================  ===============================
+        fontcolor         str or list         Color of the names
+        fontsize          int                 Size of the font for names
+        rotate_names      (list of) bool(s)   Rotate names by 90°
+        sort              str                 Either "size" or "distance"
+        zero_entry_size   float               Size of zero-weight reciprocal
+        ================  ==================  ===============================
     """
 ```
 

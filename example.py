@@ -30,10 +30,11 @@ sorts = ("size", "size", "distance", "distance")  # sort type
 cclrs = (None, None, "slategrey", None)           # chord colors
 nrota = (False, False, True, True)                # name rotation
 cmaps = (None, None, None, "summer")              # colormap
+fclrs = "grey"                                    # fontcolors
 
 for grd, gap, srt, cc, nr, cm in zip(grads, gaps, sorts, cclrs, nrota, cmaps):
     chord_diagram(flux, names, gap=gap, use_gradient=grd, sort=srt,
-                  cmap=cm, chord_colors=cc, rotate_names=nr)
+                  cmap=cm, chord_colors=cc, rotate_names=nr, fontcolor=fclrs)
 
     str_grd = "_gradient" if grd else ""
 

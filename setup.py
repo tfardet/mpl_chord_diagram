@@ -14,9 +14,13 @@ except OSError as e:
         raise
 
 
+from _info import __version__
+
+
 # move important files
 move = (
     '__init__.py',
+    '_info.py',
     'LICENSE',
     'chord_diagram.py',
     'gradient.py',
@@ -31,8 +35,6 @@ for fname in move:
     except Exception as e:
         print(e)
 
-
-from mpl_chord_diagram import __version__
 
 long_descr = '''
 The module enables to plot chord diagrams with matplotlib from lists,
@@ -58,7 +60,7 @@ try:
         install_requires = ['numpy', 'scipy', 'matplotlib'],
 
         # Metadata
-        url = 'https://github.com/Silmathoron/mpl_chord_diagram',
+        url = 'https://codeberg.org/tfardet/mpl_chord_diagram',
         author = 'Tanguy Fardet',
         author_email = 'tanguy.fardet@tuebingen.mpg.de',
         license = 'MIT',

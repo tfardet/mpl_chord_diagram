@@ -55,24 +55,33 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
     use_gradient : bool, optional (default: False)
         Whether a gradient should be use so that chord extremities have the
         same color as the arc they belong to.
-    chord_colors : str, RGB tuple, list, optional (default: None)
+    chord_colors : str, or list of colors, optional (default: None)
         Specify color(s) to fill the chords differently from the arcs.
         When the keyword is not used, chord colors default to the colomap given
         by `colors`.
         Possible values for `chord_colors` are:
-         * a single color or RGB tuple, e.g. "red" or ``(1, 0, 0)``; all chords
-           will have this color
-         * a list of colors, e.g. ``["red","green","blue"]``, one per node.
-           Each chord will get its color from its associated source node, or
-           from both nodes if `use_gradient` is True.
+
+        * a single color (do not use an RGB tuple, use hex format instead),
+          e.g. "red" or "#ff0000"; all chords will have this color
+        * a list of colors, e.g. ``["red", "green", "blue"]``, one per node
+          (in this case, RGB tuples are accepted as entries to the list).
+          Each chord will get its color from its associated source node, or
+          from both nodes if `use_gradient` is True.
     show : bool, optional (default: False)
         Whether the plot should be displayed immediately via an automatic call
         to `plt.show()`.
-    **kwargs : keyword arguments
-        Available kwargs are "fontsize" and "sort" (either "size" or
-        "distance"), "zero_entry_size" (in degrees, default: 0.5),
-        "rotate_names" (a bool or list of bools) to rotate (some of) the
-        names by 90°.
+    kwargs : keyword arguments
+        Available kwargs are:
+
+        ================  ==================  ===============================
+              Name               Type           Purpose and possible values
+        ================  ==================  ===============================
+        fontcolor         str or list         Color of the names
+        fontsize          int                 Size of the font for names
+        rotate_names      (list of) bool(s)   Rotate names by 90°
+        sort              str                 Either "size" or "distance"
+        zero_entry_size   float               Size of zero-weight reciprocal
+        ================  ==================  ===============================
     """
     import matplotlib.pyplot as plt
 
@@ -132,10 +141,18 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
     if colors is None:
         colors = np.linspace(0, 1, num_nodes)
 
+    fontcolor = kwargs.get("fontcolor", "k")
+
+    if isinstance(fontcolor, str):
+        fontcolor = [fontcolor]*num_nodes
+    else:
+        assert len(fontcolor) == num_nodes, \
+            "One fontcolor per node is required."
+
     if cmap is None:
         cmap = "viridis"
 
-    if isinstance(colors, (Sequence, np.ndarray)):
+    if isinstance(colors, (list, tuple, np.ndarray)):
         assert len(colors) == num_nodes, "One color per node is required."
 
         # check color type
@@ -260,6 +277,7 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
         for i, (pos, name, r) in enumerate(zip(nodePos, names, rotation)):
             rotate = rotate_names[i]
             pp = prop.copy()
+            pp["color"] = fontcolor[i]
 
             if rotate:
                 angle  = np.average(arc[i])
