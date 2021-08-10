@@ -134,6 +134,9 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
         if names is not None:
             names = [names[i] for i in order]
 
+        if colors is not None:
+            colors = [colors[i] for i in order]
+
     # sum over rows
     x = mat.sum(axis=1).A1 if is_sparse else mat.sum(axis=1)
 
