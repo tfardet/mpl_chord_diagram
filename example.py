@@ -4,7 +4,7 @@ Example file
 
 import os
 import sys
-sys.path.append(os.path.abspath(".."))
+sys.path = [os.path.abspath("..")] + sys.path
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -21,6 +21,7 @@ flux = np.array([
 ])
 
 names = ['non-crystal', 'FCC', 'HCP', 'BCC']
+
 
 # plot different examples
 
@@ -42,5 +43,23 @@ for grd, gap, srt, cc, nr, cm in zip(grads, gaps, sorts, cclrs, nrota, cmaps):
         "images/example{}_sort-{}.png".format(str_grd, srt),
                 dpi=600, transparent=True, bbox_inches='tight',
                 pad_inches=0.02)
+
+plt.show()
+
+
+# plot with partial circle
+
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 5))
+
+keep = list(range(len(flux) - 1))
+
+total = flux.sum()
+partial = flux[keep][:, keep].sum()
+
+colors = ["#cc2233", "#2233cc", "orange", "gray"]
+
+chord_diagram(flux, names, ax=ax1, colors=colors, start_at=60)
+chord_diagram(flux[keep][:, keep], names[:-1], ax=ax2, colors=colors[:-1],
+              start_at=60, extent=360*partial/total)
 
 plt.show()

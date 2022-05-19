@@ -21,7 +21,8 @@ LW = 0.3
 
 def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
                   chordwidth=0.7, ax=None, colors=None, cmap=None, alpha=0.7,
-                  use_gradient=False, chord_colors=None, show=False, **kwargs):
+                  use_gradient=False, chord_colors=None, start_at=0, extent=360,
+                  show=False, **kwargs):
     """
     Plot a chord diagram.
 
@@ -67,10 +68,18 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
           (in this case, RGB tuples are accepted as entries to the list).
           Each chord will get its color from its associated source node, or
           from both nodes if `use_gradient` is True.
+    start_at : float, optional (default : 0)
+        Location, in degrees, where the diagram should start on the unit circle.
+        Default is to start at 0 degrees, i.e. (x, y) = (1, 0) or 3 o'clock),
+        and move counter-clockwise
+    extent : float, optional (default : 360)
+        The angular aperture, in degrees, of the diagram.
+        Default is to use the whole circle, i.e. 360 degrees, but in some cases
+        it can be useful to use only a part of it.
     show : bool, optional (default: False)
         Whether the plot should be displayed immediately via an automatic call
         to `plt.show()`.
-    kwargs : keyword arguments
+    **kwargs : keyword arguments
         Available kwargs are:
 
         ================  ==================  ===============================
@@ -101,7 +110,7 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
 
     # set entry size for zero entries that have a nonzero reciprocal
     min_deg  = kwargs.get("zero_entry_size", 0.5)
-    min_deg *= mat.sum() / (360 - num_nodes*pad)
+    min_deg *= mat.sum() / (extent - num_nodes * pad)
 
     if is_sparse:
         nnz = mat.nonzero()
@@ -180,21 +189,19 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
                 "one color per node (here {} colors).".format(num_nodes)
 
     # find position for each start and end
-    y = x / np.sum(x).astype(float) * (360 - pad*len(x))
+    y = x / np.sum(x).astype(float) * (extent - pad * len(x))
 
     pos = {}
     arc = []
     nodePos = []
     rotation = []
-    start = 0
 
     # compute all values and optionally apply sort
     for i in range(num_nodes):
-        end = start + y[i]
-        arc.append((start, end))
-        angle = 0.5*(start+end)
-
-        if -30 <= angle <= 180:
+        end = start_at + y[i]
+        arc.append((start_at, end))
+        angle = 0.5*(start_at+end)
+        if -30 <= angle%360 <= 180:
             angle -= 90
             rotation.append(False)
         else:
@@ -202,9 +209,9 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
             rotation.append(True)
 
         nodePos.append(
-            tuple(polar2xy(1.05, 0.5*(start + end)*np.pi/180.)) + (angle,))
+            tuple(polar2xy(1.05, 0.5*(start_at + end)*np.pi/180.)) + (angle,))
 
-        z = _get_normed_line(mat, i, x, start, end, is_sparse)
+        z = _get_normed_line(mat, i, x, start_at, end, is_sparse)
 
         # sort chords
         ids = None
@@ -225,31 +232,31 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
         else:
             raise ValueError("Invalid `sort`: '{}'".format(kwargs["sort"]))
 
-        z0 = start
+        z0 = start_at
 
         for j in ids:
             pos[(i, j)] = (z0, z0 + z[j])
             z0 += z[j]
 
-        start = end + pad
+        start_at = end + pad
 
     # plot
     for i in range(len(x)):
         color = colors[i]
 
         # plot the arcs
-        start, end = arc[i]
+        start_at, end = arc[i]
 
-        ideogram_arc(start=start, end=end, radius=1.0, color=color,
+        ideogram_arc(start=start_at, end=end, radius=1.0, color=color,
                      width=width, alpha=alpha, ax=ax)
 
-        start, end = pos[(i, i)]
+        start_at, end = pos[(i, i)]
 
         chord_color = chord_colors[i]
 
         # plot self-chords
         if mat[i, i] > 0:
-            self_chord_arc(start, end, radius=1 - width - gap,
+            self_chord_arc(start_at, end, radius=1 - width - gap,
                            chordwidth=0.7*chordwidth, color=chord_color,
                            alpha=alpha, ax=ax)
 
@@ -264,7 +271,8 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
                 chord_arc(
                     start1, end1, start2, end2, radius=1 - width - gap,
                     chordwidth=chordwidth, color=chord_color, cend=cend,
-                    alpha=alpha, ax=ax, use_gradient=use_gradient)
+                    alpha=alpha, ax=ax, use_gradient=use_gradient,
+                    extent=extent)
 
     # add names if necessary
     if names is not None:
@@ -462,7 +470,8 @@ def ideogram_arc(start, end, radius=1., width=0.2, color="r", alpha=0.7,
 
 
 def chord_arc(start1, end1, start2, end2, radius=1.0, pad=2, chordwidth=0.7,
-              ax=None, color="r", cend="r", alpha=0.7, use_gradient=False):
+              ax=None, color="r", cend="r", alpha=0.7, use_gradient=False,
+              extent=360):
     '''
     Draw a chord between two regions (arcs) of the chord diagram.
 
@@ -491,6 +500,10 @@ def chord_arc(start1, end1, start2, end2, radius=1.0, pad=2, chordwidth=0.7,
     use_gradient : bool, optional (default: False)
         Whether a gradient should be use so that chord extremities have the
         same color as the arc they belong to.
+    extent : float, optional (default : 360)
+        The angular aperture, in degrees, of the diagram.
+        Default is to use the whole circle, i.e. 360 degrees, but in some cases
+        it can be useful to use only a part of it.
 
     Returns
     -------
@@ -499,8 +512,8 @@ def chord_arc(start1, end1, start2, end2, radius=1.0, pad=2, chordwidth=0.7,
     '''
     chordwidth2 = chordwidth
 
-    dtheta1 = min((start1 - end2) % 360, (end2 - start1) % 360)
-    dtheta2 = min((end1 - start2) % 360, (start2 - end1) % 360)
+    dtheta1 = min((start1 - end2) % extent, (end2 - start1) % extent)
+    dtheta2 = min((end1 - start2) % extent, (start2 - end1) % extent)
 
     start1, end1, verts, codes = initial_path(start1, end1, radius, chordwidth)
 
