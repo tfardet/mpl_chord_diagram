@@ -82,22 +82,28 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
     **kwargs : keyword arguments
         Available kwargs are:
 
-        ================  ==================  ===============================
-              Name               Type           Purpose and possible values
-        ================  ==================  ===============================
-        fontcolor         str or list         Color of the names
+        ================  ==================  ==================================
+              Name               Type            Purpose and possible values
+        ================  ==================  ==================================
+        fontcolor         str or list         Color of the names (default: "k")
+        ----------------  ------------------  ----------------------------------
         fontsize          int                 Size of the font for names
+        ----------------  ------------------  ----------------------------------
         rotate_names      (list of) bool(s)   Rotate names by 90°
+        ----------------  ------------------  ----------------------------------
         sort              str                 Either "size" or "distance"
-        zero_entry_size   float               Size of zero-weight reciprocal
-        ================  ==================  ===============================
+        ----------------  ------------------  ----------------------------------
+                                              Minimal chord width to replace
+        min_chord_width   float               small entries and zero reciprocals
+                                              in the matrix (default: 0)
+        ================  ==================  ==================================
     """
     import matplotlib.pyplot as plt
 
     if ax is None:
         _, ax = plt.subplots()
 
-    # copy matrix and set a minimal value for visibility of zero fluxes
+    # copy matrix
     is_sparse = ssp.issparse(mat)
 
     if is_sparse:
@@ -105,24 +111,29 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
     else:
         mat = np.array(mat, copy=True)
 
-    # mat[i, j]:  i -> j
     num_nodes = mat.shape[0]
 
-    # set entry size for zero entries that have a nonzero reciprocal
-    min_deg  = kwargs.get("zero_entry_size", 0.5)
-    min_deg *= mat.sum() / (extent - num_nodes * pad)
+    # set min entry size for small entries and zero reciprocals
+    # mat[i, j]:  i -> j
+    min_deg = kwargs.get("min_chord_width", 0)
 
-    if is_sparse:
+    if is_sparse and min_deg:
         nnz = mat.nonzero()
 
+        mat.data[mat.data < min_deg] = min_deg
+
+        # check zero reciprocals
         for i, j in zip(*nnz):
-            if mat[j, i] == 0:
+            if mat[j, i] < min_deg:
                 mat[j, i] = min_deg
     else:
-        zeros = np.argwhere(mat == 0)
+        nnz = mat > 0
 
-        for (i, j) in zeros:
-            if mat[j, i] != 0:
+        mat[nnz] = np.maximum(mat[nnz], min_deg)
+
+        # check zero reciprocals
+        for i, j in zip(*np.where(~nnz)):
+            if mat[j, i]:
                 mat[i, j] = min_deg
 
     # check name rotations

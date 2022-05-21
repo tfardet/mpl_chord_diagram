@@ -34,10 +34,10 @@ Here is what the diagrams look like:
 ## Main plot function
 
 ```python
-
 def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
                   chordwidth=0.7, ax=None, colors=None, cmap=None, alpha=0.7,
-                  use_gradient=False, chord_colors=None, show=False, **kwargs):
+                  use_gradient=False, chord_colors=None, start_at=0, extent=360,
+                  show=False, **kwargs):
     """
     Plot a chord diagram.
 
@@ -83,21 +83,35 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
           (in this case, RGB tuples are accepted as entries to the list).
           Each chord will get its color from its associated source node, or
           from both nodes if `use_gradient` is True.
+    start_at : float, optional (default : 0)
+        Location, in degrees, where the diagram should start on the unit circle.
+        Default is to start at 0 degrees, i.e. (x, y) = (1, 0) or 3 o'clock),
+        and move counter-clockwise
+    extent : float, optional (default : 360)
+        The angular aperture, in degrees, of the diagram.
+        Default is to use the whole circle, i.e. 360 degrees, but in some cases
+        it can be useful to use only a part of it.
     show : bool, optional (default: False)
         Whether the plot should be displayed immediately via an automatic call
         to `plt.show()`.
-    kwargs : keyword arguments
+    **kwargs : keyword arguments
         Available kwargs are:
 
-        ================  ==================  ===============================
-              Name               Type           Purpose and possible values
-        ================  ==================  ===============================
-        fontcolor         str or list         Color of the names
+        ================  ==================  ==================================
+              Name               Type            Purpose and possible values
+        ================  ==================  ==================================
+        fontcolor         str or list         Color of the names (default: "k")
+        ----------------  ------------------  ----------------------------------
         fontsize          int                 Size of the font for names
+        ----------------  ------------------  ----------------------------------
         rotate_names      (list of) bool(s)   Rotate names by 90°
+        ----------------  ------------------  ----------------------------------
         sort              str                 Either "size" or "distance"
-        zero_entry_size   float               Size of zero-weight reciprocal
-        ================  ==================  ===============================
+        ----------------  ------------------  ----------------------------------
+                                              Minimal chord width to replace
+        min_chord_width   float               small entries and zero reciprocals
+                                              in the matrix (default: 0)
+        ================  ==================  ==================================
     """
 ```
 

@@ -14,10 +14,10 @@ from mpl_chord_diagram import chord_diagram
 # flux matrix
 
 flux = np.array([
-    [11975,  5871, 8916, 2868],
-    [ 1951, 10048, 2060, 6171],
+    [11975,  5871,  8916, 2868],
+    [ 1951, 10048,  2060, 6171],
     [ 8010, 16145, 81090, 8045],
-    [ 1013,   990,  940, 6907]
+    [ 1013,   990,   940, 6907]
 ])
 
 names = ['non-crystal', 'FCC', 'HCP', 'BCC']
@@ -61,5 +61,22 @@ colors = ["#cc2233", "#2233cc", "orange", "gray"]
 chord_diagram(flux, names, ax=ax1, colors=colors, start_at=60)
 chord_diagram(flux[keep][:, keep], names[:-1], ax=ax2, colors=colors[:-1],
               start_at=60, extent=360*partial/total)
+
+plt.show()
+
+
+# min chord width zero reciprocals
+
+flux = np.array([
+    [11975,  5871,  8916,     0],
+    [ 1951,     0,  2060,     0],
+    [ 8010, 16145,  3504,     0],
+    [    0,  5200,   300,  6907]
+])
+
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 5))
+
+chord_diagram(flux, names, ax=ax1)
+chord_diagram(flux, names, ax=ax2, min_chord_width=200)
 
 plt.show()
