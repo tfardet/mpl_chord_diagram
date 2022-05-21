@@ -163,3 +163,10 @@ installed automatically. If necessary, you can also install them by calling
 * Do not plot chords that have zero in and out weights
   [gph82](https://github.com/gph82)
   (PR [#14/17](https://github.com/Silmathoron/mpl_chord_diagram/pull/14))
+
+
+## Alternative solutions in Python
+
+See the Python Graph Gallery's
+[chord diagram entry](https://www.python-graph-gallery.com/chord-diagram/) for
+alternative libraries.
