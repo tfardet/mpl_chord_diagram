@@ -13,7 +13,7 @@ import numpy as np
 import scipy.sparse as ssp
 
 from .gradient import gradient
-from .utilities import _get_normed_line, dist, polar2xy
+from .utilities import _get_normed_line, compute_positions, dist, polar2xy
 
 
 LW = 0.3
@@ -22,14 +22,25 @@ LW = 0.3
 def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
                   chordwidth=0.7, ax=None, colors=None, cmap=None, alpha=0.7,
                   use_gradient=False, chord_colors=None, start_at=0, extent=360,
-                  show=False, **kwargs):
+                  directed=False, show=False, **kwargs):
     """
     Plot a chord diagram.
+
+    Draws a representation of many-to-many interactions between elements, given
+    by an interaction matrix.
+    The elements are represented by arcs proportional to their degree and the
+    interactions (or fluxes) are drawn as chords joining two arcs:
+
+    * for undirected chords, the size of the arc is proportional to its
+      out-degree (or simply its degree if the matrix is fully symmetrical), i.e.
+      the sum of the element's row.
+    * for directed chords, the size is proportional to the total-degree, i.e.
+      the sum of the element's row and column.
 
     Parameters
     ----------
     mat : square matrix
-        Flux data, mat[i, j] is the flux from i to j
+        Flux data, ``mat[i, j]`` is the flux from i to j.
     names : list of str, optional (default: no names)
         Names of the nodes that will be displayed (must be ordered as the
         matrix entries).
@@ -76,6 +87,10 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
         The angular aperture, in degrees, of the diagram.
         Default is to use the whole circle, i.e. 360 degrees, but in some cases
         it can be useful to use only a part of it.
+    directed : bool, optional (default: False)
+        Whether the chords should be directed, like edges in a graph, with one
+        part of each arc dedicated to outgoing chords and the other to incoming
+        ones.
     show : bool, optional (default: False)
         Whether the plot should be displayed immediately via an automatic call
         to `plt.show()`.
@@ -91,7 +106,8 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
         ----------------  ------------------  ----------------------------------
         rotate_names      (list of) bool(s)   Rotate names by 90°
         ----------------  ------------------  ----------------------------------
-        sort              str                 Either "size" or "distance"
+        sort              str                 Either None, "size", or "distance"
+                                              (default is "size")
         ----------------  ------------------  ----------------------------------
                                               Minimal chord width to replace
         min_chord_width   float               small entries and zero reciprocals
@@ -112,6 +128,9 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
         mat = np.array(mat, copy=True)
 
     num_nodes = mat.shape[0]
+
+    # don't use gradient with directed chords
+    use_gradient *= not directed
 
     # set min entry size for small entries and zero reciprocals
     # mat[i, j]:  i -> j
@@ -157,9 +176,6 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
         if colors is not None:
             colors = [colors[i] for i in order]
 
-    # sum over rows
-    x = mat.sum(axis=1).A1 if is_sparse else mat.sum(axis=1)
-
     # configure colors
     if colors is None:
         colors = np.linspace(0, 1, num_nodes)
@@ -199,60 +215,28 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
                 "If `chord_colors` is a list of colors, it should include " \
                 "one color per node (here {} colors).".format(num_nodes)
 
-    # find position for each start and end
-    y = x / np.sum(x).astype(float) * (extent - pad * len(x))
+    # sum over rows
+    out_deg = mat.sum(axis=1).A1 if is_sparse else mat.sum(axis=1)
+    in_deg = None
+    degree = out_deg.copy()
+
+    if directed:
+        # also sum over columns
+        in_deg = mat.sum(axis=0).A1 if is_sparse else mat.sum(axis=0)
+        degree += in_deg
 
     pos = {}
+    pos_dir = {}
     arc = []
     nodePos = []
     rotation = []
 
     # compute all values and optionally apply sort
-    for i in range(num_nodes):
-        end = start_at + y[i]
-        arc.append((start_at, end))
-        angle = 0.5*(start_at+end)
-        if -30 <= angle%360 <= 180:
-            angle -= 90
-            rotation.append(False)
-        else:
-            angle -= 270
-            rotation.append(True)
-
-        nodePos.append(
-            tuple(polar2xy(1.05, 0.5*(start_at + end)*np.pi/180.)) + (angle,))
-
-        z = _get_normed_line(mat, i, x, start_at, end, is_sparse)
-
-        # sort chords
-        ids = None
-
-        if kwargs.get("sort", "size") == "size":
-            ids = np.argsort(z)
-        elif kwargs["sort"] == "distance":
-            remainder = 0 if num_nodes % 2 else -1
-
-            ids  = list(range(i - int(0.5*num_nodes), i))[::-1]
-            ids += [i]
-            ids += list(range(i + int(0.5*num_nodes) + remainder, i, -1))
-
-            # put them back into [0, num_nodes[
-            ids = np.array(ids)
-            ids[ids < 0] += num_nodes
-            ids[ids >= num_nodes] -= num_nodes
-        else:
-            raise ValueError("Invalid `sort`: '{}'".format(kwargs["sort"]))
-
-        z0 = start_at
-
-        for j in ids:
-            pos[(i, j)] = (z0, z0 + z[j])
-            z0 += z[j]
-
-        start_at = end + pad
+    compute_positions(mat, degree, in_deg, out_deg, start_at, is_sparse, kwargs,
+                      directed, extent, pad, arc, rotation, nodePos, pos)
 
     # plot
-    for i in range(len(x)):
+    for i in range(num_nodes):
         color = colors[i]
 
         # plot the arcs
@@ -261,29 +245,29 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
         ideogram_arc(start=start_at, end=end, radius=1.0, color=color,
                      width=width, alpha=alpha, ax=ax)
 
-        start_at, end = pos[(i, i)]
-
         chord_color = chord_colors[i]
 
-        # plot self-chords
-        if mat[i, i] > 0:
-            self_chord_arc(start_at, end, radius=1 - width - gap,
+        # plot self-chords if directed is False
+        if not directed and mat[i, i]:
+            start1, end1, _, _ = pos[(i, i)]
+            self_chord_arc(start1, end1, radius=1 - width - gap,
                            chordwidth=0.7*chordwidth, color=chord_color,
                            alpha=alpha, ax=ax)
 
         # plot all other chords
-        for j in range(i):
+        targets = range(num_nodes) if directed else range(i)
+
+        for j in targets:
             cend = chord_colors[j]
 
-            start1, end1 = pos[(i, j)]
-            start2, end2 = pos[(j, i)]
+            start1, end1, start2, end2 = pos[(i, j)]
 
-            if mat[i, j] > 0 or mat[j, i] > 0:
+            if mat[i, j] > 0 or (not directed and mat[j, i] > 0):
                 chord_arc(
-                    start1, end1, start2, end2, radius=1 - width - gap,
+                    start1, end1, start2, end2, radius=1 - width - gap, gap=gap,
                     chordwidth=chordwidth, color=chord_color, cend=cend,
                     alpha=alpha, ax=ax, use_gradient=use_gradient,
-                    extent=extent)
+                    extent=extent, directed=directed)
 
     # add names if necessary
     if names is not None:
@@ -480,9 +464,9 @@ def ideogram_arc(start, end, radius=1., width=0.2, color="r", alpha=0.7,
     return verts, codes
 
 
-def chord_arc(start1, end1, start2, end2, radius=1.0, pad=2, chordwidth=0.7,
-              ax=None, color="r", cend="r", alpha=0.7, use_gradient=False,
-              extent=360):
+def chord_arc(start1, end1, start2, end2, radius=1.0, gap=0.03, pad=2,
+              chordwidth=0.7, ax=None, color="r", cend="r", alpha=0.7,
+              use_gradient=False, extent=360, directed=False):
     '''
     Draw a chord between two regions (arcs) of the chord diagram.
 
@@ -498,6 +482,8 @@ def chord_arc(start1, end1, start2, end2, radius=1.0, pad=2, chordwidth=0.7,
         Final degree.
     radius : float, optional (default: 1)
         External radius of the arc.
+    gap : float, optional (default: 0)
+        Distance between the arc and the beginning of the cord.
     chordwidth : float, optional (default: 0.2)
         Width of the chord.
     ax : matplotlib axis, optional (default: not plotted)
@@ -515,6 +501,8 @@ def chord_arc(start1, end1, start2, end2, radius=1.0, pad=2, chordwidth=0.7,
         The angular aperture, in degrees, of the diagram.
         Default is to use the whole circle, i.e. 360 degrees, but in some cases
         it can be useful to use only a part of it.
+    directed : bool, optional (default: False)
+        Whether the chords should be directed, ending in an arrow.
 
     Returns
     -------
@@ -528,7 +516,23 @@ def chord_arc(start1, end1, start2, end2, radius=1.0, pad=2, chordwidth=0.7,
 
     start1, end1, verts, codes = initial_path(start1, end1, radius, chordwidth)
 
-    start2, end2, verts2, _ = initial_path(start2, end2, radius, chordwidth)
+    if directed:
+        if start2 > end2:
+            start2, end2 = end2, start2
+
+        start2 *= np.pi/180.
+        end2   *= np.pi/180.
+
+        tip = 0.5*(start2 + end2)
+        asize = max(gap, 0.02)
+
+        verts2 = [
+            polar2xy(radius - asize, start2),
+            polar2xy(radius, tip),
+            polar2xy(radius - asize, end2)
+        ]
+    else:
+        start2, end2, verts2, _ = initial_path(start2, end2, radius, chordwidth)
 
     chordwidth2 *= np.clip(0.4 + (dtheta1 - 2*pad) / (15*pad), 0.2, 1)
 
@@ -545,25 +549,40 @@ def chord_arc(start1, end1, start2, end2, radius=1.0, pad=2, chordwidth=0.7,
         polar2xy(radius, start1),
     ]
 
+    # update codes
+
     codes += [
         Path.CURVE4,
         Path.CURVE4,
-        Path.CURVE4,
-        Path.CURVE4,
-        Path.CURVE4,
-        Path.CURVE4,
-        Path.LINETO,
-        Path.CURVE4,
-        Path.CURVE4,
-        Path.CURVE4,
-        Path.LINETO,
-        Path.CURVE4,
-        Path.CURVE4,
-        Path.CURVE4,
-        Path.LINETO,
-        Path.CURVE4,
-        Path.CURVE4,
-        Path.CURVE4,
+    ]
+
+    if directed:
+        codes += [
+            Path.CURVE4,
+            Path.LINETO,
+            Path.LINETO,
+        ]
+    else:
+        codes += [
+            Path.CURVE4,
+            Path.CURVE4,
+            Path.CURVE4,
+            Path.CURVE4,
+            Path.LINETO,
+            Path.CURVE4,
+            Path.CURVE4,
+            Path.CURVE4,
+            Path.LINETO,
+            Path.CURVE4,
+            Path.CURVE4,
+            Path.CURVE4,
+            Path.LINETO,
+            Path.CURVE4,
+            Path.CURVE4,
+            Path.CURVE4,
+        ]
+
+    codes += [
         Path.CURVE4,
         Path.CURVE4,
         Path.CURVE4,

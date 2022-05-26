@@ -15,14 +15,14 @@ be able to be used more easily as a git submodule.
 
 An example can be found in file `example.py`.
 Here is what the diagrams look like:
-* Upper left  >  no gradient, no gap, default colormap, default order
-* Upper right >  gradient, no gap, "summer" colormap, rotated names, sorted by distance
-* Lower left  >  no gradient but gap, single color for chords, rotated names, sorted by distance
-* Lower right >  gradient and gap, default colormap, default order
+* Upper left  > no gradient, no gap, default colormap, default order
+* Upper right > directed, no gap, "summer" colormap, rotated names, sorted by distance
+* Lower left  > no gradient but gap, single color for chords, rotated names, sorted by distance
+* Lower right > gradient and gap, default colormap, sorted by size
 
-<img src="images/example_sort-size.png" width="390"
-     alt="Chord diagram without gradient, sorted by size"><img
-     src="images/example_gradient_sort-distance.png" width="390"
+<img src="images/example_sort-None.png" width="390"
+     alt="Chord diagram without gradient, not sorted"><img
+     src="images/example_sort-distance_directed.png" width="390"
      alt="Chord diagram without gradient, sorted by distance">
 
 <img src="images/example_sort-distance.png" width="390"
@@ -37,14 +37,25 @@ Here is what the diagrams look like:
 def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
                   chordwidth=0.7, ax=None, colors=None, cmap=None, alpha=0.7,
                   use_gradient=False, chord_colors=None, start_at=0, extent=360,
-                  show=False, **kwargs):
+                  directed=False, show=False, **kwargs):
     """
     Plot a chord diagram.
+
+    Draws a representation of many-to-many interactions between elements, given
+    by an interaction matrix.
+    The elements are represented by arcs proportional to their degree and the
+    interactions (or fluxes) are drawn as chords joining two arcs:
+
+    * for undirected chords, the size of the arc is proportional to its
+      out-degree (or simply its degree if the matrix is fully symmetrical), i.e.
+      the sum of the element's row.
+    * for directed chords, the size is proportional to the total-degree, i.e.
+      the sum of the element's row and column.
 
     Parameters
     ----------
     mat : square matrix
-        Flux data, mat[i, j] is the flux from i to j
+        Flux data, ``mat[i, j]`` is the flux from i to j.
     names : list of str, optional (default: no names)
         Names of the nodes that will be displayed (must be ordered as the
         matrix entries).
@@ -91,6 +102,10 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
         The angular aperture, in degrees, of the diagram.
         Default is to use the whole circle, i.e. 360 degrees, but in some cases
         it can be useful to use only a part of it.
+    directed : bool, optional (default: False)
+        Whether the chords should be directed, like edges in a graph, with one
+        part of each arc dedicated to outgoing chords and the other to incoming
+        ones.
     show : bool, optional (default: False)
         Whether the plot should be displayed immediately via an automatic call
         to `plt.show()`.
@@ -106,7 +121,8 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
         ----------------  ------------------  ----------------------------------
         rotate_names      (list of) bool(s)   Rotate names by 90°
         ----------------  ------------------  ----------------------------------
-        sort              str                 Either "size" or "distance"
+        sort              str                 Either None, "size", or "distance"
+                                              (default is "size")
         ----------------  ------------------  ----------------------------------
                                               Minimal chord width to replace
         min_chord_width   float               small entries and zero reciprocals
