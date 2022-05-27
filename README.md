@@ -1,6 +1,9 @@
 # mpl_chord_diagram
 
-[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE) ![PyPI](https://img.shields.io/pypi/v/mpl-chord-diagram)
+[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
+![PyPI](https://img.shields.io/pypi/v/mpl-chord-diagram)
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6583470.svg)](https://doi.org/10.5281/zenodo.6583470)
+
 
 Python module to plot chord diagrams with [matplotlib](https://matplotlib.org).
 
@@ -15,20 +18,20 @@ be able to be used more easily as a git submodule.
 
 An example can be found in file `example.py`.
 Here is what the diagrams look like:
-* Upper left  > no gradient, no gap, default colormap, default order
-* Upper right > directed, no gap, "summer" colormap, rotated names, sorted by distance
-* Lower left  > no gradient but gap, single color for chords, rotated names, sorted by distance
-* Lower right > gradient and gap, default colormap, sorted by size
-
-<img src="images/example_sort-None.png" width="390"
-     alt="Chord diagram without gradient, not sorted"><img
-     src="images/example_sort-distance_directed.png" width="390"
-     alt="Chord diagram without gradient, sorted by distance">
+* Upper left  > no gradient, no gap, default colormap, chords sorted by distance
+* Upper right > directed chords, no gap, "summer" colormap, rotated names, chords sorted by distance
+* Lower left  > gap, single color for chords, rotated names, unsorted chords
+* Lower right > gradient and gap, default colormap, chords sorted by size
 
 <img src="images/example_sort-distance.png" width="390"
-     alt="Chord diagram without gradient, sorted by distance"><img
+     alt="Chord diagram without gradient, chords sorted by distance"><img
+     src="images/example_sort-distance_directed.png" width="390"
+     alt="Chord diagram with directed chords and rotated names, chords sorted by distance">
+
+<img src="images/example_sort-None.png" width="390"
+     alt="Chord diagram without grey chords in unsorted order"><img
      src="images/example_gradient_sort-size.png" width="390"
-     alt="Chord diagram without gradient, sorted by size">
+     alt="Chord diagram with gradient, sorted by size">
 
 
 ## Main plot function
