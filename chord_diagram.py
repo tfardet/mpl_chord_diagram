@@ -145,7 +145,7 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
         for i, j in zip(*nnz):
             if mat[j, i] < min_deg:
                 mat[j, i] = min_deg
-    else:
+    elif min_deg:
         nnz = mat > 0
 
         mat[nnz] = np.maximum(mat[nnz], min_deg)
