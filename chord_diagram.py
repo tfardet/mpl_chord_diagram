@@ -4,9 +4,10 @@ Tools to draw a chord diagram in python
 
 from collections.abc import Sequence
 
+import matplotlib as mpl
 import matplotlib.patches as patches
 
-from matplotlib.colors import ColorConverter
+from matplotlib.colors import ColorConverter, Colormap
 from matplotlib.path import Path
 
 import numpy as np
@@ -189,7 +190,9 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
             "One fontcolor per node is required."
 
     if cmap is None:
-        cmap = "viridis"
+        cmap = mpl.colormaps["viridis"]
+    elif not isinstance(cmap, Colormap):
+        cmap = mpl.colormaps[cmap]
 
     if isinstance(colors, (list, tuple, np.ndarray)):
         assert len(colors) == num_nodes, "One color per node is required."
@@ -198,8 +201,7 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
         first_color = colors[0]
 
         if isinstance(first_color, (int, float, np.integer)):
-            cm = plt.get_cmap(cmap)
-            colors = cm(colors)[:, :3]
+            colors = cmap(colors)[:, :3]
         else:
             colors = [ColorConverter.to_rgb(c) for c in colors]
     else:
