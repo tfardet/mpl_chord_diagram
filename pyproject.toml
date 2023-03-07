@@ -1,0 +1,44 @@
+# SPDX-FileCopyrightText: 2022 Tanguy Fardet
+# SPDX-License-Identifier: CC0-1.0
+
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+
+[project]
+name = "mpl-chord-diagram"
+authors = [
+  { name="Tanguy Fardet", email="tanguyfardet@protonmail.com" },
+  { name="Guillermo Pérez-Hernández" },
+]
+description = "Python module to plot chord diagrams with matplotlib."
+readme = "README.md"
+keywords = [
+    "chord diagram", "matplotlib", "plotting", "dataviz", "data visualization"
+]
+license = {file = "LICENSE"}
+requires-python = ">=3.7"
+dynamic = ["dependencies", "version"]
+classifiers = [
+    "Development Status :: 5 - Production/Stable",
+    "Intended Audience :: Science/Research",
+    "License :: OSI Approved :: MIT License",
+    "Natural Language :: English",
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+    "Topic :: Scientific/Engineering :: Visualization",
+    "Framework :: Matplotlib",
+]
+
+[project.urls]
+repository = "https://codeberg.org/tfardet/mpl_chord_diagram"
+
+
+[tool.setuptools]
+package-dir = {mpl_chord_diagram = "."}
+packages = ["mpl_chord_diagram"]
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
+version = {attr = "mpl_chord_diagram.__version__"}

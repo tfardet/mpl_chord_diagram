@@ -124,7 +124,7 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
     is_sparse = ssp.issparse(mat)
 
     if is_sparse:
-        mat = mat.tocsr(copy=True)
+        mat = ssp.csr_matrix(mat)
     else:
         mat = np.array(mat, copy=True)
 

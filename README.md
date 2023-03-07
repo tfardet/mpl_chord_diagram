@@ -1,7 +1,7 @@
 # mpl_chord_diagram
 
-[![License](https://img.shields.io/badge/license-MIT-green)](LICENSE)
-![PyPI](https://img.shields.io/pypi/v/mpl-chord-diagram)
+[![License: MIT](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
+[![PyPI](https://img.shields.io/pypi/v/mpl-chord-diagram)](https://pypi.org/project/mpl-chord-diagram)
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.6583470.svg)](https://doi.org/10.5281/zenodo.6583470)
 
 
@@ -23,14 +23,14 @@ Here is what the diagrams look like:
 * Lower left  > gap, single color for chords, rotated names, unsorted chords
 * Lower right > gradient and gap, default colormap, chords sorted by size
 
-<img src="images/example_sort-distance.png" width="390"
+<img src="https://codeberg.org/tfardet/mpl_chord_diagram/media/branch/main/images/example_sort-distance.png" width="390"
      alt="Chord diagram without gradient, chords sorted by distance"><img
-     src="images/example_sort-distance_directed.png" width="390"
+     src="https://codeberg.org/tfardet/mpl_chord_diagram/media/branch/main/images/example_sort-distance_directed.png" width="390"
      alt="Chord diagram with directed chords and rotated names, chords sorted by distance">
 
-<img src="images/example_sort-None.png" width="390"
+<img src="https://codeberg.org/tfardet/mpl_chord_diagram/media/branch/main/images/example_sort-None.png" width="390"
      alt="Chord diagram without grey chords in unsorted order"><img
-     src="images/example_gradient_sort-size.png" width="390"
+     src="https://codeberg.org/tfardet/mpl_chord_diagram/media/branch/main/images/example_gradient_sort-size.png" width="390"
      alt="Chord diagram with gradient, sorted by size">
 
 
