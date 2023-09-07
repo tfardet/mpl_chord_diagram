@@ -30,7 +30,7 @@ def polar2xy(r, theta):
     return np.array([r*np.cos(theta), r*np.sin(theta)])
 
 
-def compute_positions(mat, deg, in_deg, out_deg, start_at, is_sparse, kwargs,
+def compute_positions(mat, deg, in_deg, out_deg, start_at, is_sparse, sort,
                       directed, extent, pad, arc, rotation, nodePos, pos):
     '''
     Compute all arcs and chords start/end positions.
@@ -52,8 +52,8 @@ def compute_positions(mat, deg, in_deg, out_deg, start_at, is_sparse, kwargs,
         Start of the first arc.
     is_sparse : bool
         Whether the matrix is sparse.
-    kwargs : dict
-        Keyword arguments.
+    sort : bool
+        Sorting method.
     directed : bool
         Whether the chords are directed.
     extent : float in ]0, 360]
@@ -103,8 +103,6 @@ def compute_positions(mat, deg, in_deg, out_deg, start_at, is_sparse, kwargs,
         ]
 
     # sort
-    sort = kwargs.get("sort", "size")
-
     mat_ids = _get_sorted_ids(sort, zmat, num_nodes, directed)
 
     # compute positions

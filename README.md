@@ -1,4 +1,4 @@
-# mpl_chord_diagram
+# mpl-chord-diagram
 
 [![License: MIT](https://img.shields.io/badge/license-MIT-green)](./LICENSE)
 [![PyPI](https://img.shields.io/pypi/v/mpl-chord-diagram)](https://pypi.org/project/mpl-chord-diagram)
@@ -37,10 +37,11 @@ Here is what the diagrams look like:
 ## Main plot function
 
 ```python
-def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
-                  chordwidth=0.7, ax=None, colors=None, cmap=None, alpha=0.7,
-                  use_gradient=False, chord_colors=None, start_at=0, extent=360,
-                  directed=False, show=False, **kwargs):
+def chord_diagram(mat, names=None, order=None, sort="size", directed=False,
+                  colors=None, cmap=None, use_gradient=False, chord_colors=None,
+                  alpha=0.7, start_at=0, extent=360, width=0.1, pad=2., gap=0.03,
+                  chordwidth=0.7, min_chord_width=0, fontsize=12.8,
+                  fontcolor="k", rotate_names=False, ax=None, show=False):
     """
     Plot a chord diagram.
 
@@ -65,23 +66,21 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
     order : list, optional (default: order of the matrix entries)
         Order in which the arcs should be placed around the trigonometric
         circle.
-    width : float, optional (default: 0.1)
-        Width/thickness of the ideogram arc.
-    pad : float, optional (default: 2)
-        Distance between two neighboring ideogram arcs. Unit: degree.
-    gap : float, optional (default: 0)
-        Distance between the arc and the beginning of the cord.
-    chordwidth : float, optional (default: 0.7)
-        Position of the control points for the chords, controlling their shape.
-    ax : matplotlib axis, optional (default: new axis)
-        Matplotlib axis where the plot should be drawn.
+    sort : str, optional (default: "size")
+        Order in which the chords should be sorted: either None (unsorted),
+        "size" (default, drawing largest chords first), or "distance"
+        (drawing the chords of the two closest arcs at each end of the current
+        arc, then progressing towards the connexions with the farthest arcs in
+        both drections as we move towards the center of the current arc).
+    directed : bool, optional (default: False)
+        Whether the chords should be directed, like edges in a graph, with one
+        part of each arc dedicated to outgoing chords and the other to incoming
+        ones.
     colors : list, optional (default: from `cmap`)
         List of user defined colors or floats.
     cmap : str or colormap object (default: viridis)
         Colormap that will be used to color the arcs and chords by default.
         See `chord_colors` to use different colors for chords.
-    alpha : float in [0, 1], optional (default: 0.7)
-        Opacity of the chord diagram.
     use_gradient : bool, optional (default: False)
         Whether a gradient should be use so that chord extremities have the
         same color as the arc they belong to.
@@ -97,6 +96,8 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
           (in this case, RGB tuples are accepted as entries to the list).
           Each chord will get its color from its associated source node, or
           from both nodes if `use_gradient` is True.
+    alpha : float in [0, 1], optional (default: 0.7)
+        Opacity of the chord diagram.
     start_at : float, optional (default : 0)
         Location, in degrees, where the diagram should start on the unit circle.
         Default is to start at 0 degrees, i.e. (x, y) = (1, 0) or 3 o'clock),
@@ -105,32 +106,29 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
         The angular aperture, in degrees, of the diagram.
         Default is to use the whole circle, i.e. 360 degrees, but in some cases
         it can be useful to use only a part of it.
-    directed : bool, optional (default: False)
-        Whether the chords should be directed, like edges in a graph, with one
-        part of each arc dedicated to outgoing chords and the other to incoming
-        ones.
+    width : float, optional (default: 0.1)
+        Width/thickness of the ideogram arc.
+    pad : float, optional (default: 2)
+        Distance between two neighboring ideogram arcs. Unit: degree.
+    gap : float, optional (default: 0)
+        Distance between the arc and the beginning of the cord.
+    chordwidth : float, optional (default: 0.7)
+        Position of the control points for the chords, controlling their shape.
+    min_chord_width : float, optional (default: 0)
+        Minimal chord width to replace small entries and zero reciprocals in
+        the matrix.
+    fontsize : float, optional (default: 12.8)
+        Size of the fonts for the names.
+    fontcolor : str or list, optional (default: black)
+        Color of the fonts for the names.
+    rotate_names : (list of) bool(s), optional (default: False)
+        Whether to rotate all names (if single boolean) or some of them (if
+        list) by 90°.
+    ax : matplotlib axis, optional (default: new axis)
+        Matplotlib axis where the plot should be drawn.
     show : bool, optional (default: False)
         Whether the plot should be displayed immediately via an automatic call
         to `plt.show()`.
-    **kwargs : keyword arguments
-        Available kwargs are:
-
-        ================  ==================  ==================================
-              Name               Type            Purpose and possible values
-        ================  ==================  ==================================
-        fontcolor         str or list         Color of the names (default: "k")
-        ----------------  ------------------  ----------------------------------
-        fontsize          int                 Size of the font for names
-        ----------------  ------------------  ----------------------------------
-        rotate_names      (list of) bool(s)   Rotate names by 90°
-        ----------------  ------------------  ----------------------------------
-        sort              str                 Either None, "size", or "distance"
-                                              (default is "size")
-        ----------------  ------------------  ----------------------------------
-                                              Minimal chord width to replace
-        min_chord_width   float               small entries and zero reciprocals
-                                              in the matrix (default: 0)
-        ================  ==================  ==================================
     """
 ```
 
@@ -153,39 +151,34 @@ installed automatically. If necessary, you can also install them by calling
     pip install -r requirements.txt
 
 
+## Citing mpl-chord-diagram
+
+Please cite our Zenodo DOI
+([10.5281/zenodo.6583470](https://doi.org/10.5281/zenodo.6583470)) if you use
+this library.
+
+**Libraries using mpl-chord-diagram:**
+
+* [NNGT](https://nngt.readthedocs.io) (graph theory)
+* [mdciao](https://proteinformatics.uni-leipzig.de/mdciao) (proteomics)
+
+
 ## Contributors
 
+* Maintainers:
+   - [Tanguy Fardet](https://tfardet.srht.site)
+   - [Guillermo Pérez-Hernández](https://codeberg.org/gph82), [gph82](https://github.com/gph82)
 * Original author: [@fengwangPhysics](https://github.com/fengwangPhysics)
-* Refactoring (Tanguy Fardet, PRs
-  [#6](https://github.com/Silmathoron/mpl_chord_diagram/pull/6),
-  [#9](https://github.com/Silmathoron/mpl_chord_diagram/pull/9) &
-  [#12](https://github.com/Silmathoron/mpl_chord_diagram/pull/12))
-* Support sparse matrices: Tanguy Fardet (PR
-  [#10](https://github.com/Silmathoron/mpl_chord_diagram/pull/10))
-* Improved color support (colormaps, gradients, chord colors):
-   - [@pakitochus](https://github.com/pakitochus) (PR
-     [#1](https://github.com/Silmathoron/mpl_chord_diagram/pull/1))
-   - Tanguy Fardet (PRs
-      [#4](https://github.com/Silmathoron/mpl_chord_diagram/pull/4),
-      [#5](https://github.com/Silmathoron/mpl_chord_diagram/pull/5) &
-      [#7](https://github.com/Silmathoron/mpl_chord_diagram/pull/7))
-   - [gph82](https://github.com/gph82) (PR
-     [#18](https://github.com/Silmathoron/mpl_chord_diagram/pull/18))
-* Improved arcs and chords:
-   - [@cy1110](https://github.com/cy1110) (PR
-     [#2](https://github.com/Silmathoron/mpl_chord_diagram/pull/2))
-   - Tanguy Fardet (PRs
-     [#6](https://github.com/Silmathoron/mpl_chord_diagram/pull/6) for
-     gap addition and
-     [#7](https://github.com/Silmathoron/mpl_chord_diagram/pull/7) for
-     adaptive curvature and sorting)
-* Do not plot chords that have zero in and out weights
-  [gph82](https://github.com/gph82)
-  (PR [#14/17](https://github.com/Silmathoron/mpl_chord_diagram/pull/14))
+* Other contributors:
+   - [@pakitochus](https://github.com/pakitochus)
+   - [@cy1110](https://github.com/cy1110)
 
 
 ## Alternative solutions in Python
 
-See the Python Graph Gallery's
+The [chord diagram](https://moshi4.github.io/pyCirclize/chord_diagram/) option
+of [pyCirclize](https://moshi4.github.io/pyCirclize/).
+
+See also the Python Graph Gallery's
 [chord diagram entry](https://www.python-graph-gallery.com/chord-diagram/) for
 alternative libraries.

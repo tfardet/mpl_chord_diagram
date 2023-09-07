@@ -20,10 +20,11 @@ from .utilities import _get_normed_line, compute_positions, dist, polar2xy
 LW = 0.3
 
 
-def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
-                  chordwidth=0.7, ax=None, colors=None, cmap=None, alpha=0.7,
-                  use_gradient=False, chord_colors=None, start_at=0, extent=360,
-                  directed=False, show=False, **kwargs):
+def chord_diagram(mat, names=None, order=None, sort="size", directed=False,
+                  colors=None, cmap=None, use_gradient=False, chord_colors=None,
+                  alpha=0.7, start_at=0, extent=360, width=0.1, pad=2., gap=0.03,
+                  chordwidth=0.7, min_chord_width=0, fontsize=12.8,
+                  fontcolor="k", rotate_names=False, ax=None, show=False):
     """
     Plot a chord diagram.
 
@@ -48,23 +49,21 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
     order : list, optional (default: order of the matrix entries)
         Order in which the arcs should be placed around the trigonometric
         circle.
-    width : float, optional (default: 0.1)
-        Width/thickness of the ideogram arc.
-    pad : float, optional (default: 2)
-        Distance between two neighboring ideogram arcs. Unit: degree.
-    gap : float, optional (default: 0)
-        Distance between the arc and the beginning of the cord.
-    chordwidth : float, optional (default: 0.7)
-        Position of the control points for the chords, controlling their shape.
-    ax : matplotlib axis, optional (default: new axis)
-        Matplotlib axis where the plot should be drawn.
+    sort : str, optional (default: "size")
+        Order in which the chords should be sorted: either None (unsorted),
+        "size" (default, drawing largest chords first), or "distance"
+        (drawing the chords of the two closest arcs at each end of the current
+        arc, then progressing towards the connexions with the farthest arcs in
+        both drections as we move towards the center of the current arc).
+    directed : bool, optional (default: False)
+        Whether the chords should be directed, like edges in a graph, with one
+        part of each arc dedicated to outgoing chords and the other to incoming
+        ones.
     colors : list, optional (default: from `cmap`)
         List of user defined colors or floats.
     cmap : str or colormap object (default: viridis)
         Colormap that will be used to color the arcs and chords by default.
         See `chord_colors` to use different colors for chords.
-    alpha : float in [0, 1], optional (default: 0.7)
-        Opacity of the chord diagram.
     use_gradient : bool, optional (default: False)
         Whether a gradient should be use so that chord extremities have the
         same color as the arc they belong to.
@@ -80,6 +79,8 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
           (in this case, RGB tuples are accepted as entries to the list).
           Each chord will get its color from its associated source node, or
           from both nodes if `use_gradient` is True.
+    alpha : float in [0, 1], optional (default: 0.7)
+        Opacity of the chord diagram.
     start_at : float, optional (default : 0)
         Location, in degrees, where the diagram should start on the unit circle.
         Default is to start at 0 degrees, i.e. (x, y) = (1, 0) or 3 o'clock),
@@ -88,32 +89,29 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
         The angular aperture, in degrees, of the diagram.
         Default is to use the whole circle, i.e. 360 degrees, but in some cases
         it can be useful to use only a part of it.
-    directed : bool, optional (default: False)
-        Whether the chords should be directed, like edges in a graph, with one
-        part of each arc dedicated to outgoing chords and the other to incoming
-        ones.
+    width : float, optional (default: 0.1)
+        Width/thickness of the ideogram arc.
+    pad : float, optional (default: 2)
+        Distance between two neighboring ideogram arcs. Unit: degree.
+    gap : float, optional (default: 0)
+        Distance between the arc and the beginning of the cord.
+    chordwidth : float, optional (default: 0.7)
+        Position of the control points for the chords, controlling their shape.
+    min_chord_width : float, optional (default: 0)
+        Minimal chord width to replace small entries and zero reciprocals in
+        the matrix.
+    fontsize : float, optional (default: 12.8)
+        Size of the fonts for the names.
+    fontcolor : str or list, optional (default: black)
+        Color of the fonts for the names.
+    rotate_names : (list of) bool(s), optional (default: False)
+        Whether to rotate all names (if single boolean) or some of them (if
+        list) by 90°.
+    ax : matplotlib axis, optional (default: new axis)
+        Matplotlib axis where the plot should be drawn.
     show : bool, optional (default: False)
         Whether the plot should be displayed immediately via an automatic call
         to `plt.show()`.
-    **kwargs : keyword arguments
-        Available kwargs are:
-
-        ================  ==================  ==================================
-              Name               Type            Purpose and possible values
-        ================  ==================  ==================================
-        fontcolor         str or list         Color of the names (default: "k")
-        ----------------  ------------------  ----------------------------------
-        fontsize          int                 Size of the font for names
-        ----------------  ------------------  ----------------------------------
-        rotate_names      (list of) bool(s)   Rotate names by 90°
-        ----------------  ------------------  ----------------------------------
-        sort              str                 Either None, "size", or "distance"
-                                              (default is "size")
-        ----------------  ------------------  ----------------------------------
-                                              Minimal chord width to replace
-        min_chord_width   float               small entries and zero reciprocals
-                                              in the matrix (default: 0)
-        ================  ==================  ==================================
     """
     import matplotlib.pyplot as plt
 
@@ -135,30 +133,26 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
 
     # set min entry size for small entries and zero reciprocals
     # mat[i, j]:  i -> j
-    min_deg = kwargs.get("min_chord_width", 0)
-
-    if is_sparse and min_deg:
+    if is_sparse and min_chord_width:
         nnz = mat.nonzero()
 
-        mat.data[mat.data < min_deg] = min_deg
+        mat.data[mat.data < min_chord_width] = min_chord_width
 
         # check zero reciprocals
         for i, j in zip(*nnz):
-            if mat[j, i] < min_deg:
-                mat[j, i] = min_deg
-    elif min_deg:
+            if mat[j, i] < min_chord_width:
+                mat[j, i] = min_chord_width
+    elif min_chord_width:
         nnz = mat > 0
 
-        mat[nnz] = np.maximum(mat[nnz], min_deg)
+        mat[nnz] = np.maximum(mat[nnz], min_chord_width)
 
         # check zero reciprocals
         for i, j in zip(*np.where(~nnz)):
             if mat[j, i]:
-                mat[i, j] = min_deg
+                mat[i, j] = min_chord_width
 
     # check name rotations
-    rotate_names = kwargs.get("rotate_names", False)
-
     if isinstance(rotate_names, Sequence):
         assert len(rotate_names) == num_nodes, \
             "Wrong number of entries in 'rotate_names'."
@@ -180,8 +174,6 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
     # configure colors
     if colors is None:
         colors = np.linspace(0, 1, num_nodes)
-
-    fontcolor = kwargs.get("fontcolor", "k")
 
     if isinstance(fontcolor, str):
         fontcolor = [fontcolor]*num_nodes
@@ -234,7 +226,7 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
     rotation = []
 
     # compute all values and optionally apply sort
-    compute_positions(mat, degree, in_deg, out_deg, start_at, is_sparse, kwargs,
+    compute_positions(mat, degree, in_deg, out_deg, start_at, is_sparse, sort,
                       directed, extent, pad, arc, rotation, nodePos, pos)
 
     # plot
@@ -276,7 +268,7 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
         assert len(names) == num_nodes, "One name per node is required."
 
         prop = {
-            "fontsize": kwargs.get("fontsize", 16*0.8),
+            "fontsize": fontsize,
             "ha": "center",
             "va": "center",
             "rotation_mode": "anchor"
