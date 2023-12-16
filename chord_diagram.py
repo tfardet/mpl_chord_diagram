@@ -260,7 +260,7 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
         for j in targets:
             cend = chord_colors[j]
             # Arc color selection
-            chord_color = chord_colors[(i+j) % len(chord_colors)]
+            chord_color = chord_colors[(i*num_nodes+j) % len(chord_colors)]
 
             start1, end1, start2, end2 = pos[(i, j)]
 
