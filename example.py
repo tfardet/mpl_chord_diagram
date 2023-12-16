@@ -22,17 +22,24 @@ flux = np.array([
 
 names = ['non-crystal', 'FCC', 'HCP', 'BCC']
 
+example_arc_colors = [
+    "#cc2233", "#2233cc", "orange", "gray",
+    "#ffcc00", "#00ffcc", "purple", "green",
+    "#00FF00", "#FF00FF", "#FFFF00", "#00FFFF",
+    "#FF0000", "#0000FF", "#800000", "#000080",
+]
+
 
 # plot different examples
 
-grads = (True, False, False, False)               # gradient
-gaps  = (0.03, 0, 0.03, 0)                        # gap value
-sorts = ("size", "distance", None, "distance")    # sort type
-cclrs = (None, None, "slategrey", None)           # chord colors
-nrota = (False, False, True, True)                # name rotation
-cmaps = (None, None, None, "summer")              # colormap
+grads = (True, False, False, False, False)               # gradient
+gaps  = (0.03, 0, 0.03, 0, 0.1)                        # gap value
+sorts = ("size", "distance", None, "distance", None)    # sort type
+cclrs = (None, None, "slategrey", None, example_arc_colors)           # chord colors
+nrota = (False, False, True, True, False)                # name rotation
+cmaps = (None, None, None, "summer", None)              # colormap
 fclrs = "grey"                                    # fontcolors
-drctd = (False, False, False, True)               # directed
+drctd = (False, False, False, True, True)               # directed
 
 args = (grads, gaps, sorts, cclrs, nrota, cmaps, drctd)
 
