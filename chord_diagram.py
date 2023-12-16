@@ -210,8 +210,8 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
     else:
         try:
             chord_colors = [ColorConverter.to_rgb(chord_colors)] * num_nodes
-        except ValueError:
-            assert len(chord_colors) == num_nodes, \
+        except ValueError: 
+            assert (len(chord_colors) % num_nodes) == 0, \
                 "If `chord_colors` is a list of colors, it should include " \
                 "one color per node (here {} colors).".format(num_nodes)
 
@@ -259,6 +259,8 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
 
         for j in targets:
             cend = chord_colors[j]
+            # Arc color selection
+            chord_color = chord_colors[(i+j) % len(chord_colors)]
 
             start1, end1, start2, end2 = pos[(i, j)]
 
