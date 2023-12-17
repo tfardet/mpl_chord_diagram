@@ -204,10 +204,18 @@ def chord_diagram(mat, names=None, order=None, sort="size", directed=False,
     else:
         try:
             chord_colors = [ColorConverter.to_rgb(chord_colors)] * num_nodes
-        except ValueError:
-            assert len(chord_colors) == num_nodes, \
+        except ValueError: 
+            assert (len(chord_colors) % num_nodes) == 0, \
                 "If `chord_colors` is a list of colors, it should include " \
                 "one color per node (here {} colors).".format(num_nodes)
+
+    # Arc colors : Only chord_colors are used
+    if (len(chord_colors)  == num_nodes):
+        arc_colors = [chord_colors[i] for i in range(num_nodes) 
+                                      for j in range(num_nodes)]
+    # Arc colors  : chord_colors contains arc colors
+    else:
+        arc_colors = chord_colors
 
     # sum over rows
     out_deg = mat.sum(axis=1).A1 if is_sparse else mat.sum(axis=1)
@@ -254,12 +262,15 @@ def chord_diagram(mat, names=None, order=None, sort="size", directed=False,
         for j in targets:
             cend = chord_colors[j]
 
+            # Arc color : Select [i,j]
+            arc_color = arc_colors[i*num_nodes+j]
+
             start1, end1, start2, end2 = pos[(i, j)]
 
             if mat[i, j] > 0 or (not directed and mat[j, i] > 0):
                 chord_arc(
                     start1, end1, start2, end2, radius=1 - width - gap, gap=gap,
-                    chordwidth=chordwidth, color=chord_color, cend=cend,
+                    chordwidth=chordwidth, color=arc_color, cend=cend,
                     alpha=alpha, ax=ax, use_gradient=use_gradient,
                     extent=extent, directed=directed)
 
