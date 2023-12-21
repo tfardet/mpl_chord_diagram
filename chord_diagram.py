@@ -21,8 +21,8 @@ LW = 0.3
 
 def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
                   chordwidth=0.7, ax=None, colors=None, cmap=None, alpha=0.7,
-                  use_gradient=False, chord_colors=None, start_at=0, extent=360,
-                  directed=False, show=False, **kwargs):
+                  ideogram_colors=None, use_gradient=False, chord_colors=None, arc_colors=None, 
+                  start_at=0, extent=360, directed=False, show=False, **kwargs):
     """
     Plot a chord diagram.
 
@@ -64,6 +64,8 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
         See `chord_colors` to use different colors for chords.
     alpha : float in [0, 1], optional (default: 0.7)
         Opacity of the chord diagram.
+    ideogram_colors : str, or list of colors, optional (default: None)
+        Specify color(s) to fill the ideogram arcs differently from the arcs.
     use_gradient : bool, optional (default: False)
         Whether a gradient should be use so that chord extremities have the
         same color as the arc they belong to.
@@ -79,6 +81,8 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
           (in this case, RGB tuples are accepted as entries to the list).
           Each chord will get its color from its associated source node, or
           from both nodes if `use_gradient` is True.
+    arc_colors : str, or list of colors, optional (default: None)
+        Specify color(s) to fill the arcs differently from the chords.
     start_at : float, optional (default : 0)
         Location, in degrees, where the diagram should start on the unit circle.
         Default is to start at 0 degrees, i.e. (x, y) = (1, 0) or 3 o'clock),
@@ -205,23 +209,43 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
     else:
         raise ValueError("`colors` should be a list.")
 
+    # Chord colors : None, populate from cmap
     if chord_colors is None:
        chord_colors = colors
+    # Chord colors : Otherwise, check user input
     else:
         try:
             chord_colors = [ColorConverter.to_rgb(chord_colors)] * num_nodes
         except ValueError: 
-            assert (len(chord_colors) % num_nodes) == 0, \
+            assert len(chord_colors) == num_nodes, \
                 "If `chord_colors` is a list of colors, it should include " \
                 "one color per node (here {} colors).".format(num_nodes)
+            
+    # Ideogram colors : None, populate from cmap
+    if ideogram_colors is None:
+        ideogram_colors = colors
+    # Ideogram colors : Otherwise, check user input
+    else:
+        try:
+            ideogram_colors = [ColorConverter.to_rgb(ideogram_colors) ] * num_nodes
+        except ValueError: 
+            assert len(ideogram_colors) == num_nodes, \
+                "If `ideogram_colors` is a list of colors, it should include " \
+                "one color per node (here {} colors).".format(num_nodes)
 
-    # Arc colors : Only chord_colors are used
-    if (len(chord_colors)  == num_nodes):
+    
+    # Arc colors : None, populate from chord_colors
+    if (arc_colors is None):
         arc_colors = [chord_colors[i] for i in range(num_nodes) 
                                       for j in range(num_nodes)]
-    # Arc colors  : chord_colors contains arc colors
+    # Arc colors : Otherwise, check user input
     else:
-        arc_colors = chord_colors
+        try:
+            arc_colors = [ColorConverter.to_rgb(arc_colors) ] * (num_nodes**2)
+        except ValueError: 
+            assert len(arc_colors) == (num_nodes**2), \
+                "If `arc_colors` is a list of colors, it should include " \
+                "one color per node (here {} colors).".format(num_nodes)
 
     # sum over rows
     out_deg = mat.sum(axis=1).A1 if is_sparse else mat.sum(axis=1)
@@ -249,10 +273,13 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
 
         # plot the arcs
         start_at, end = arc[i]
+        # Ideogram color : Select [i]
+        ideogram_color = ideogram_colors[i]
 
-        ideogram_arc(start=start_at, end=end, radius=1.0, color=color,
+        ideogram_arc(start=start_at, end=end, radius=1.0, color=ideogram_color,
                      width=width, alpha=alpha, ax=ax)
-
+        
+        # Chord color : Select [i, j]
         chord_color = chord_colors[i]
 
         # plot self-chords if directed is False

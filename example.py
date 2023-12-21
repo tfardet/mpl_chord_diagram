@@ -30,22 +30,26 @@ example_arc_colors = [
 ]
 
 
+
+
 # plot different examples
 
-grads = (True, False, False, False, False)               # gradient
-gaps  = (0.03, 0, 0.03, 0, 0.1)                        # gap value
-sorts = ("size", "distance", None, "distance", None)    # sort type
-cclrs = (None, None, "slategrey", None, example_arc_colors)           # chord colors
-nrota = (False, False, True, True, False)                # name rotation
-cmaps = (None, None, None, "summer", None)              # colormap
-fclrs = "grey"                                    # fontcolors
-drctd = (False, False, False, True, True)               # directed
+grads = (True, False, False, False, False)                  # gradient
+gaps  = (0.03, 0, 0.03, 0, 0.1)                             # gap value
+sorts = ("size", "distance", None, "distance", None)        # sort type
+iclrs = (None, None, None, None, "slategray")               # Ideogram colors
+cclrs = (None, None, "slategrey", None, None)               # chord colors
+aclrs = (None, None, None, None, example_arc_colors)        # arc colors
+nrota = (False, False, True, True, False)                   # name rotation
+cmaps = (None, None, None, "summer", None)                  # colormap
+fclrs = "grey"                                              # fontcolors
+drctd = (False, False, False, True, True)                   # directed
 
-args = (grads, gaps, sorts, cclrs, nrota, cmaps, drctd)
+args = (grads, gaps, sorts, iclrs, cclrs, aclrs, nrota, cmaps, drctd)
 
-for grd, gap, srt, cc, nr, cm, d in zip(*args):
+for grd, gap, srt, ic, cc, ac, nr, cm, d in zip(*args):
     chord_diagram(flux, names, gap=gap, use_gradient=grd, sort=srt, directed=d,
-                  cmap=cm, chord_colors=cc, rotate_names=nr, fontcolor=fclrs)
+                  cmap=cm, ideogram_colors=ic, chord_colors=cc, arc_colors=ac, rotate_names=nr, fontcolor=fclrs)
 
     str_grd = "_gradient" if grd else ""
 
