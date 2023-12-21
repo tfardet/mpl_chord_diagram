@@ -81,8 +81,6 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
           (in this case, RGB tuples are accepted as entries to the list).
           Each chord will get its color from its associated source node, or
           from both nodes if `use_gradient` is True.
-    arc_colors : str, or list of colors, optional (default: None)
-        Specify color(s) to fill the arcs differently from the chords.
     start_at : float, optional (default : 0)
         Location, in degrees, where the diagram should start on the unit circle.
         Default is to start at 0 degrees, i.e. (x, y) = (1, 0) or 3 o'clock),
