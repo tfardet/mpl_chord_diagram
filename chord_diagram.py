@@ -21,7 +21,7 @@ LW = 0.3
 
 def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
                   chordwidth=0.7, ax=None, colors=None, cmap=None, alpha=0.7,
-                  ideogram_colors=None, use_gradient=False, chord_colors=None, arc_colors=None, 
+                  ideogram_colors=None, use_gradient=False, chord_colors=None, 
                   start_at=0, extent=360, directed=False, show=False, **kwargs):
     """
     Plot a chord diagram.
@@ -208,18 +208,6 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
             colors = [ColorConverter.to_rgb(c) for c in colors]
     else:
         raise ValueError("`colors` should be a list.")
-
-    # Chord colors : None, populate from cmap
-    if chord_colors is None:
-       chord_colors = colors
-    # Chord colors : Otherwise, check user input
-    else:
-        try:
-            chord_colors = [ColorConverter.to_rgb(chord_colors)] * num_nodes
-        except ValueError: 
-            assert len(chord_colors) == num_nodes, \
-                "If `chord_colors` is a list of colors, it should include " \
-                "one color per node (here {} colors).".format(num_nodes)
             
     # Ideogram colors : None, populate from cmap
     if ideogram_colors is None:
@@ -233,19 +221,23 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
                 "If `ideogram_colors` is a list of colors, it should include " \
                 "one color per node (here {} colors).".format(num_nodes)
 
-    
-    # Arc colors : None, populate from chord_colors
-    if (arc_colors is None):
-        arc_colors = [chord_colors[i] for i in range(num_nodes) 
-                                      for j in range(num_nodes)]
-    # Arc colors : Otherwise, check user input
+    # Chord colors : None, populate from cmap
+    if chord_colors is None:
+       chord_colors = colors
+    # Chord colors : Otherwise, check user input
     else:
         try:
-            arc_colors = [ColorConverter.to_rgb(arc_colors) ] * (num_nodes**2)
+            chord_colors = [ColorConverter.to_rgb(chord_colors)] * (num_nodes ** 2)
         except ValueError: 
-            assert len(arc_colors) == (num_nodes**2), \
-                "If `arc_colors` is a list of colors, it should include " \
-                "one color per node (here {} colors).".format(num_nodes)
+            assert (len(chord_colors) == num_nodes) or (len(chord_colors) == (num_nodes**2)), \
+                "If `chord_colors` is a list of colors, it should include " \
+                "one color per node (here {} colors) or per arc (here {} colors).".format(num_nodes, num_nodes**2)
+
+    
+    # Chord colors : Populate for arcs, if only colors per nodes given
+    if (len(chord_colors)== num_nodes):
+        chord_colors = [chord_colors[i] for i in range(num_nodes) 
+                                      for j in range(num_nodes)]
 
     # sum over rows
     out_deg = mat.sum(axis=1).A1 if is_sparse else mat.sum(axis=1)
@@ -279,8 +271,8 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
         ideogram_arc(start=start_at, end=end, radius=1.0, color=ideogram_color,
                      width=width, alpha=alpha, ax=ax)
         
-        # Chord color : Select [i, j]
-        chord_color = chord_colors[i]
+        # Chord color : Select color per node
+        chord_color = chord_colors[i*num_nodes]
 
         # plot self-chords if directed is False
         if not directed and mat[i, i]:
@@ -295,8 +287,8 @@ def chord_diagram(mat, names=None, order=None, width=0.1, pad=2., gap=0.03,
         for j in targets:
             cend = chord_colors[j]
 
-            # Arc color : Select [i,j]
-            arc_color = arc_colors[i*num_nodes+j]
+            # Chord color : Select per arc
+            arc_color = chord_colors[i*num_nodes+j]
 
             start1, end1, start2, end2 = pos[(i, j)]
 
